@@ -10,10 +10,21 @@ export const AuthProvider = ({ children }) => {
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
   //  check auth user
+  // apiRequest function
+  const apiRequest = async (url, method = "GET", data = null) => {
+    try {
+      const res = await axiosInstance({ url, method, data });
+      return res.data;
+    } catch (err) {
+      return err.response?.data || { success: false };
+    }
+  };
+
+  // ✅ check auth user
   const checkAuth = async () => {
     setLoadingAuth(true);
     try {
-      const res = await axiosInstance.get("/me");
+      const res = await axiosInstance.get("/my-profile");
       setAuthUser(res.data.user);
     } catch (err) {
       setAuthUser(null);
@@ -81,6 +92,7 @@ const login = async (email, password) => {
         loadingAuth,
         isUpdatingProfile,
         updateProfile,
+        apiRequest,
       }}
     >
       {children}

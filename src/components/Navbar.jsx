@@ -3,6 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { LogOut, User, Settings } from "lucide-react";
 import toast from "react-hot-toast";
+import { FolderKanban } from "lucide-react";
 
 const Navbar = () => {
   const { authUser, logout } = useContext(AuthContext);
@@ -32,6 +33,9 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             <Link to="/profile" className="flex items-center gap-1 text-gray-700 hover:text-primary transition">
               <User className="w-4 h-4" /> Profile
+            </Link>
+            <Link to="/projects" className="flex items-center gap-1 text-gray-700 hover:text-primary transition">
+              <FolderKanban className="w-4 h-4" /> Projects
             </Link>
             <Link to="/settings" className="flex items-center gap-1 text-gray-700 hover:text-primary transition">
               <Settings className="w-4 h-4" /> Settings
