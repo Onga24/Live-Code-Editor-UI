@@ -25,9 +25,13 @@ function App() {
 
     <div>
       <Navbar />
+      <main className="pt-15">
+
         <Routes>
           <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+
           
           <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
           <Route path="/signup" element={<GuestRoute><SignUpPage /></GuestRoute>} />
@@ -36,6 +40,7 @@ function App() {
           <Route path="/reset-password" element={<GuestRoute><ResetPasswordPage /></GuestRoute>} />
           <Route path="/otp" element={<GuestRoute><VerifyOtpPage /></GuestRoute>} />
         </Routes>
+        </main>
     </div>
           <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
 
