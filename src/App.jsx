@@ -15,6 +15,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage'
 import { ProtectedRoute, GuestRoute } from "./components/ProtectedRoute";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import CodeEditor from './pages/CodeEditor';
+import Chat from './pages/Chat'
 
 
 
@@ -24,28 +25,36 @@ function App() {
   return (
     <>
 
-    <div>
-      <Navbar />
-      <main className="min-h-screen bg-gray-900 text-gray-200 p-4 md:p-8 flex flex-col">
+      <div>
+        <Navbar />
+        <main className="min-h-screen bg-gray-900 text-gray-200 p-4 md:p-8 flex flex-col">
 
-        <Routes>
-          <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-          <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-          <Route path="/code-editor" element={<ProtectedRoute><CodeEditor /></ProtectedRoute>} />
-          
-          <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
-          <Route path="/signup" element={<GuestRoute><SignUpPage /></GuestRoute>} />
+          <Routes>
+            <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
+            <Route
+              path="/projects/:id/chat"
+              element={
+                <ProtectedRoute>
+                  <Chat user={authUser} />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+            <Route path="/code-editor" element={<ProtectedRoute><CodeEditor /></ProtectedRoute>} />
 
-          <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
-          <Route path="/reset-password" element={<GuestRoute><ResetPasswordPage /></GuestRoute>} />
-          <Route path="/otp" element={<GuestRoute><VerifyOtpPage /></GuestRoute>} />
+            <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+            <Route path="/signup" element={<GuestRoute><SignUpPage /></GuestRoute>} />
 
-        </Routes>
+            <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
+            <Route path="/reset-password" element={<GuestRoute><ResetPasswordPage /></GuestRoute>} />
+            <Route path="/otp" element={<GuestRoute><VerifyOtpPage /></GuestRoute>} />
+
+          </Routes>
         </main>
-    </div>
-          <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+      </div>
+      <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
 
     </>
   )

@@ -565,6 +565,10 @@
 // export default CodeEditor
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bot, User, Lightbulb, Bug, Code, Sparkles } from 'lucide-react';
+import Chat from './Chat';
+import { MessageSquare, X } from "lucide-react";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const FileTextIcon = () => (
   <svg
@@ -811,8 +815,12 @@ What specific coding help do you need?`;
 };
 
 function CodeEditor() {
+  const { authUser } = useContext(AuthContext);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const projectId = 'proj1'; // url
+
   const initialProject = {
-    id: 'proj1',
+    id: projectId,
     title: 'Collaborative App',
     files: [
       { 
@@ -1100,6 +1108,12 @@ function CodeEditor() {
           <span className="text-sky-400">Project:</span> {project.title}
         </h1>
         <div className="flex items-center space-x-4">
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700"
+          >
+            <MessageSquare size={18} /> Chat
+          </button>
           <span className={`text-sm px-3 py-1 rounded-full ${
             status.includes('Saved') ? 'bg-green-900 text-green-200' :
             status.includes('Created') ? 'bg-blue-900 text-blue-200' :
@@ -1383,7 +1397,23 @@ function CodeEditor() {
           </div>
         </div>
       </div>
+       {/* ✅ Sidebar Chat */}
+       {/* ✅ Sidebar Chat */}
+      {isChatOpen && (
+        <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-lg border-l z-50 flex flex-col">
+          {/* Header */}
+          <div className="flex justify-between items-center p-3 border-b bg-purple-600 text-white">
+            <h2 className="font-semibold">Project Chat</h2>
+            <button onClick={() => setIsChatOpen(false)}>
+              <X size={20} />
+            </button>
+          </div>
+          {/* Chat Component */}
+          <Chat user={authUser} projectId={projectId} />
+        </div>
+      )}
     </div>
+    
   );
 }
 
