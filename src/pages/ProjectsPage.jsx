@@ -125,8 +125,29 @@ const ProjectsPage = () => {
                     <Users size={18} className="text-zinc-500" />
                     <span className="text-sm">{p.members?.length || 1} Members</span>
                     </div>
+                     <div className="flex items-center mt-4">
+                     <h3 className="text-sm font-semibold mr-2">Members:</h3>
+                    <div className="flex -space-x-2 overflow-hidden">
+                    {p.members && p.members.map(member => (
+                  <img
+                    key={member.id}
+                    className="inline-block h-8 w-8 rounded-full ring-2 ring-white"
+                    src={member.profile_picture_url || 'path/to/default/image.png'}
+                    // alt={`${member.}'s profile picture`}
+                    title={member.name}
+                  />
+            ))}
+        </div>
+    </div>
+                      <a
+                        key={p.id}
+                        href={`/code-editor?project_id=${p.id}`}
+                        className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        Open Project
+                      </a>
                 </div>
                 ))}
+
             </div>
             )}
         </div>

@@ -21,6 +21,10 @@ import AdminUsersPage from './pages/Admin/AdminUsersPage'
 import AdminProjectsPage from './pages/Admin/AdminProjectsPage'
 import AdminLayout from './pages/Admin/AdminLayout';
 
+import CodeEditor from './pages/CodeEditor';
+
+
+
 
 function App() {
   const { authUser } = useContext(AuthContext);
@@ -29,14 +33,14 @@ function App() {
 
     <div>
       <Navbar />
-      <main className="pt-15">
+      <main className="min-h-screen bg-gray-900 text-gray-200 p-4 md:p-8 flex flex-col">
 
         <Routes>
           <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-
+          <Route path="/code-editor" element={<ProtectedRoute><CodeEditor /></ProtectedRoute>} />
           
           <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
           <Route path="/signup" element={<GuestRoute><SignUpPage /></GuestRoute>} />
