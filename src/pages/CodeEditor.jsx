@@ -35,7 +35,7 @@
 //     'tsx': 'typescript',
 //     'json': 'json',
 //     'xml': 'xml',
-    
+
 //     // Programming Languages
 //     'py': 'python',
 //     'php': 'php',
@@ -49,7 +49,7 @@
 //     'swift': 'swift',
 //     'kt': 'kotlin',
 //     'scala': 'scala',
-    
+
 //     // Shell & Config
 //     'sh': 'shell',
 //     'bash': 'shell',
@@ -58,27 +58,27 @@
 //     'toml': 'toml',
 //     'ini': 'ini',
 //     'conf': 'ini',
-    
+
 //     // Markup & Documentation
 //     'md': 'markdown',
 //     'markdown': 'markdown',
 //     'tex': 'latex',
-    
+
 //     // Database
 //     'sql': 'sql',
-    
+
 //     // Other
 //     'txt': 'plaintext',
 //     'log': 'plaintext'
 //   };
-  
+
 //   return languageMap[extension] || 'plaintext';
 // };
 
 // // Get default content based on file extension
 // const getDefaultContent = (filename) => {
 //   const extension = filename.split('.').pop()?.toLowerCase();
-  
+
 //   const templates = {
 //     'html': '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Document</title>\n</head>\n<body>\n    <h1>Hello World!</h1>\n</body>\n</html>',
 //     'css': '/* Add your styles here */\nbody {\n    font-family: Arial, sans-serif;\n    margin: 0;\n    padding: 20px;\n}',
@@ -88,7 +88,7 @@
 //     'md': '# Markdown Document\n\nWrite your content here...',
 //     'json': '{\n    "name": "example",\n    "version": "1.0.0"\n}'
 //   };
-  
+
 //   return templates[extension] || '';
 // };
 
@@ -159,7 +159,7 @@
 //     const newTheme = isDarkMode ? 'vs' : 'vs-dark';
 //     setIsDarkMode(!isDarkMode);
 
-   
+
 //   };
 //     // Create editor instance only once
 //     const language = getLanguageFromExtension(activeFile.name);
@@ -193,7 +193,7 @@
 //       if (contentChangeTimeoutRef.current) {
 //         clearTimeout(contentChangeTimeoutRef.current);
 //       }
-      
+
 //       // Set new timeout for debounced update
 //       contentChangeTimeoutRef.current = setTimeout(() => {
 //         if (monacoEditorRef.current) {
@@ -233,24 +233,24 @@
 
 //     const currentValue = monacoEditorRef.current.getValue();
 //     const newLanguage = getLanguageFromExtension(activeFile.name);
-    
+
 //     // Only update if content actually changed
 //     if (currentValue !== activeFile.content) {
 //       // Save cursor position
 //       const position = monacoEditorRef.current.getPosition();
-      
+
 //       // Update content without triggering change events temporarily
 //       const model = monacoEditorRef.current.getModel();
 //       if (model) {
 //         model.setValue(activeFile.content);
 //       }
-      
+
 //       // Restore cursor position if possible and content allows it
 //       if (position && position.lineNumber <= model.getLineCount()) {
 //         monacoEditorRef.current.setPosition(position);
 //       }
 //     }
-    
+
 //     // Update language
 //     const model = monacoEditorRef.current.getModel();
 //     if (model && monacoInstanceRef.current) {
@@ -277,15 +277,15 @@
 //   const handleSave = async () => {
 //     setIsSaving(true);
 //     setStatus('Saving...');
-    
+
 //     // Simulate save operation
 //     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
 //     console.log('Saving project:', project);
 //     setStatus('Saved successfully!');
 //     setIsSaving(false);
 //     setTimeout(() => setStatus(''), 3000);
-    
+
 //     // Return focus to editor after saving
 //     setTimeout(() => {
 //       if (monacoEditorRef.current) {
@@ -314,7 +314,7 @@
 //     setNewFileName('');
 //     setStatus(`Created ${fullFileName}`);
 //     setTimeout(() => setStatus(''), 2000);
-    
+
 //     // Focus editor after creating new file
 //     setTimeout(() => {
 //       if (monacoEditorRef.current) {
@@ -517,7 +517,7 @@
 //             ))}
 //           </ul>
 //         </div>
-        
+
 //         {/* Editor and Preview */}
 //         <div className="flex-1 flex flex-col gap-6">
 //           {/* Code Editor */}
@@ -569,6 +569,7 @@ import Chat from './Chat';
 import { MessageSquare, X } from "lucide-react";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { getAIResponse } from "../lib/aiService";
 
 const FileTextIcon = () => (
   <svg
@@ -605,7 +606,7 @@ const getLanguageFromExtension = (filename) => {
     'tsx': 'typescript',
     'json': 'json',
     'xml': 'xml',
-    
+
     // Programming Languages
     'py': 'python',
     'php': 'php',
@@ -619,7 +620,7 @@ const getLanguageFromExtension = (filename) => {
     'swift': 'swift',
     'kt': 'kotlin',
     'scala': 'scala',
-    
+
     // Shell & Config
     'sh': 'shell',
     'bash': 'shell',
@@ -628,27 +629,27 @@ const getLanguageFromExtension = (filename) => {
     'toml': 'toml',
     'ini': 'ini',
     'conf': 'ini',
-    
+
     // Markup & Documentation
     'md': 'markdown',
     'markdown': 'markdown',
     'tex': 'latex',
-    
+
     // Database
     'sql': 'sql',
-    
+
     // Other
     'txt': 'plaintext',
     'log': 'plaintext'
   };
-  
+
   return languageMap[extension] || 'plaintext';
 };
 
 // Get default content based on file extension
 const getDefaultContent = (filename) => {
   const extension = filename.split('.').pop()?.toLowerCase();
-  
+
   const templates = {
     'html': '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Document</title>\n</head>\n<body>\n    <h1>Hello World!</h1>\n</body>\n</html>',
     'css': '/* Add your styles here */\nbody {\n    font-family: Arial, sans-serif;\n    margin: 0;\n    padding: 20px;\n}',
@@ -658,16 +659,21 @@ const getDefaultContent = (filename) => {
     'md': '# Markdown Document\n\nWrite your content here...',
     'json': '{\n    "name": "example",\n    "version": "1.0.0"\n}'
   };
-  
+
   return templates[extension] || '';
 };
 
+// open ai
+const getDynamicAIResponse = async (message, currentFile, allFiles) => {
+  return await getAIResponse(message, currentFile, allFiles);
+};
+
 // AI Assistant responses based on code analysis
-const getAIResponse = (message, currentFile, allFiles) => {
+const getStaticAIResponse = (message, currentFile, allFiles) => {
   const lowerMessage = message.toLowerCase();
   const fileExtension = currentFile?.name.split('.').pop()?.toLowerCase();
   const content = currentFile?.content || '';
-  
+
   // Quick tips based on file type
   if (lowerMessage.includes('tip') || lowerMessage.includes('hint')) {
     const tips = {
@@ -696,36 +702,36 @@ const getAIResponse = (message, currentFile, allFiles) => {
         "Use virtual environments for project dependencies"
       ]
     };
-    
+
     const tipList = tips[fileExtension] || tips['js'];
     const randomTip = tipList[Math.floor(Math.random() * tipList.length)];
     return `💡 **${fileExtension?.toUpperCase() || 'Code'} Tip:** ${randomTip}`;
   }
-  
+
   // Code analysis
   if (lowerMessage.includes('analyze') || lowerMessage.includes('review')) {
     if (!content.trim()) {
       return "📝 Your file is empty. Start by adding some code and I'll help analyze it!";
     }
-    
+
     const issues = [];
     const suggestions = [];
-    
+
     if (fileExtension === 'html') {
       if (!content.includes('<!DOCTYPE html>')) issues.push("Missing DOCTYPE declaration");
       if (!content.includes('<meta charset=')) issues.push("Missing charset meta tag");
       if (!content.includes('viewport')) suggestions.push("Add viewport meta tag for mobile responsiveness");
     }
-    
+
     if (fileExtension === 'js') {
       if (content.includes('var ')) suggestions.push("Consider using 'const' or 'let' instead of 'var'");
       if (content.includes('==') && !content.includes('===')) suggestions.push("Use strict equality (===) instead of loose equality (==)");
     }
-    
+
     if (fileExtension === 'css') {
       if (content.includes('!important')) suggestions.push("Try to avoid !important - use more specific selectors instead");
     }
-    
+
     let analysis = "🔍 **Code Analysis:**\n\n";
     if (issues.length > 0) {
       analysis += "**Issues Found:**\n" + issues.map(issue => `• ${issue}`).join('\n') + '\n\n';
@@ -736,10 +742,10 @@ const getAIResponse = (message, currentFile, allFiles) => {
     if (issues.length === 0 && suggestions.length === 0) {
       analysis += "Your code looks good! No major issues detected.";
     }
-    
+
     return analysis;
   }
-  
+
   // Error debugging
   if (lowerMessage.includes('error') || lowerMessage.includes('debug') || lowerMessage.includes('fix')) {
     return `🐛 **Debug Helper:**
@@ -763,7 +769,7 @@ ${fileExtension === 'css' ? `• Missing closing braces
 
 Share your specific error message for more targeted help!`;
   }
-  
+
   // Code explanation
   if (lowerMessage.includes('explain') || lowerMessage.includes('what does')) {
     return `📚 **Code Explanation:**
@@ -777,7 +783,7 @@ I'd be happy to explain your code! Here's what I can help with:
 
 Paste the specific code snippet you'd like me to explain!`;
   }
-  
+
   // Default responses for common queries
   if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
     return `👋 Hello! I'm your AI coding assistant. I can help you with:
@@ -790,7 +796,7 @@ Paste the specific code snippet you'd like me to explain!`;
 
 What would you like help with today?`;
   }
-  
+
   if (lowerMessage.includes('help')) {
     return `🚀 **Available Commands:**
 
@@ -802,7 +808,7 @@ What would you like help with today?`;
 
 I can also answer specific questions about ${fileExtension?.toUpperCase() || 'programming'}!`;
   }
-  
+
   // Default response
   return `🤔 I'd love to help! Try asking me to:
   
@@ -823,10 +829,10 @@ function CodeEditor() {
     id: projectId,
     title: 'Collaborative App',
     files: [
-      { 
-        id: 'file1', 
-        name: 'index.html', 
-        content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Hello World</title>\n    <style>\n        body { \n            font-family: Arial, sans-serif; \n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n            color: white;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            min-height: 100vh;\n            margin: 0;\n        }\n        .container {\n            text-align: center;\n            background: rgba(255, 255, 255, 0.1);\n            padding: 2rem;\n            border-radius: 15px;\n            backdrop-filter: blur(10px);\n        }\n    </style>\n</head>\n<body>\n    <div class="container">\n        <h1>🚀 Welcome to the Code Editor!</h1>\n        <p>This is a live HTML preview. Try editing the code!</p>\n        <button onclick="alert(\'Hello from JavaScript!\')" style="padding: 10px 20px; border: none; border-radius: 5px; background: #4CAF50; color: white; cursor: pointer;">Click Me!</button>\n    </div>\n</body>\n</html>' 
+      {
+        id: 'file1',
+        name: 'index.html',
+        content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Hello World</title>\n    <style>\n        body { \n            font-family: Arial, sans-serif; \n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n            color: white;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            min-height: 100vh;\n            margin: 0;\n        }\n        .container {\n            text-align: center;\n            background: rgba(255, 255, 255, 0.1);\n            padding: 2rem;\n            border-radius: 15px;\n            backdrop-filter: blur(10px);\n        }\n    </style>\n</head>\n<body>\n    <div class="container">\n        <h1>🚀 Welcome to the Code Editor!</h1>\n        <p>This is a live HTML preview. Try editing the code!</p>\n        <button onclick="alert(\'Hello from JavaScript!\')" style="padding: 10px 20px; border: none; border-radius: 5px; background: #4CAF50; color: white; cursor: pointer;">Click Me!</button>\n    </div>\n</body>\n</html>'
       },
     ]
   };
@@ -839,7 +845,7 @@ function CodeEditor() {
   const [newFileName, setNewFileName] = useState('');
   const [newFileExtension, setNewFileExtension] = useState('html');
   const [monacoLoaded, setMonacoLoaded] = useState(false);
-  
+
   // Chat-related state
   const [chatMessages, setChatMessages] = useState([
     {
@@ -858,6 +864,32 @@ function CodeEditor() {
   const monacoInstanceRef = useRef(null);
   const contentChangeTimeoutRef = useRef(null);
   const chatEndRef = useRef(null);
+
+  const handleSend = async () => {
+    if (!chatInput.trim()) return;
+
+    // أضف رسالة المستخدم
+    setChatMessages(prev => [
+      ...prev,
+      { id: Date.now(), type: "user", message: chatInput, timestamp: new Date() }
+    ]);
+
+    const userMessage = chatInput;
+    setChatInput("");
+    setIsTyping(true);
+
+    // استدعاء Laravel API
+    const aiReply = await getAIResponse(userMessage);
+
+    // أضف رد AI
+    setChatMessages(prev => [
+      ...prev,
+      { id: Date.now() + 1, type: "ai", message: aiReply, timestamp: new Date() }
+    ]);
+
+    setIsTyping(false);
+  };
+
 
   // Auto-scroll chat to bottom
   const scrollToBottom = () => {
@@ -880,10 +912,10 @@ function CodeEditor() {
     script.src = "https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs/loader.js";
     script.async = true;
     script.onload = () => {
-      window.require.config({ 
-        paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs' } 
+      window.require.config({
+        paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs' }
       });
-      window.require(['vs/editor/editor.main'], function(monaco) {
+      window.require(['vs/editor/editor.main'], function (monaco) {
         monacoInstanceRef.current = monaco;
         setMonacoLoaded(true);
       });
@@ -934,7 +966,7 @@ function CodeEditor() {
       if (contentChangeTimeoutRef.current) {
         clearTimeout(contentChangeTimeoutRef.current);
       }
-      
+
       contentChangeTimeoutRef.current = setTimeout(() => {
         if (monacoEditorRef.current) {
           const newCode = monacoEditorRef.current.getValue();
@@ -973,19 +1005,19 @@ function CodeEditor() {
 
     const currentValue = monacoEditorRef.current.getValue();
     const newLanguage = getLanguageFromExtension(activeFile.name);
-    
+
     if (currentValue !== activeFile.content) {
       const position = monacoEditorRef.current.getPosition();
       const model = monacoEditorRef.current.getModel();
       if (model) {
         model.setValue(activeFile.content);
       }
-      
+
       if (position && position.lineNumber <= model.getLineCount()) {
         monacoEditorRef.current.setPosition(position);
       }
     }
-    
+
     const model = monacoEditorRef.current.getModel();
     if (model && monacoInstanceRef.current) {
       monacoInstanceRef.current.editor.setModelLanguage(model, newLanguage);
@@ -1001,14 +1033,14 @@ function CodeEditor() {
   const handleSave = async () => {
     setIsSaving(true);
     setStatus('Saving...');
-    
+
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     console.log('Saving project:', project);
     setStatus('Saved successfully!');
     setIsSaving(false);
     setTimeout(() => setStatus(''), 3000);
-    
+
     setTimeout(() => {
       if (monacoEditorRef.current) {
         monacoEditorRef.current.focus();
@@ -1036,7 +1068,7 @@ function CodeEditor() {
     setNewFileName('');
     setStatus(`Created ${fullFileName}`);
     setTimeout(() => setStatus(''), 2000);
-    
+
     setTimeout(() => {
       if (monacoEditorRef.current) {
         monacoEditorRef.current.focus();
@@ -1082,7 +1114,8 @@ function CodeEditor() {
 
     // Simulate AI thinking time
     setTimeout(() => {
-      const aiResponse = getAIResponse(chatInput, activeFile, project.files);
+      // const aiResponse = getStaticAIResponse(chatInput, activeFile, project.files);
+      const aiResponse = getDynamicAIResponse(chatInput, activeFile, project.files);
       const aiMessage = {
         id: Date.now() + 1,
         type: 'ai',
@@ -1114,23 +1147,21 @@ function CodeEditor() {
           >
             <MessageSquare size={18} /> Chat
           </button>
-          <span className={`text-sm px-3 py-1 rounded-full ${
-            status.includes('Saved') ? 'bg-green-900 text-green-200' :
+          <span className={`text-sm px-3 py-1 rounded-full ${status.includes('Saved') ? 'bg-green-900 text-green-200' :
             status.includes('Created') ? 'bg-blue-900 text-blue-200' :
-            status.includes('deleted') ? 'bg-red-900 text-red-200' :
-            status.includes('Error') ? 'bg-red-900 text-red-200' :
-            'text-gray-400'
-          }`}>
+              status.includes('deleted') ? 'bg-red-900 text-red-200' :
+                status.includes('Error') ? 'bg-red-900 text-red-200' :
+                  'text-gray-400'
+            }`}>
             {status || 'Ready'}
           </span>
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-              isSaving 
-                ? 'bg-gray-600 cursor-not-allowed' 
-                : 'bg-green-600 hover:bg-green-700 hover:shadow-lg transform hover:scale-105'
-            }`}
+            className={`px-6 py-2 rounded-lg font-semibold transition-all ${isSaving
+              ? 'bg-gray-600 cursor-not-allowed'
+              : 'bg-green-600 hover:bg-green-700 hover:shadow-lg transform hover:scale-105'
+              }`}
           >
             {isSaving ? 'Saving...' : 'Save Project'}
           </button>
@@ -1204,11 +1235,10 @@ function CodeEditor() {
             {project.files.map(file => (
               <li
                 key={file.id}
-                className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
-                  file.id === activeFileId 
-                    ? 'bg-sky-600 text-white shadow-lg' 
-                    : 'hover:bg-gray-700'
-                }`}
+                className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${file.id === activeFileId
+                  ? 'bg-sky-600 text-white shadow-lg'
+                  : 'hover:bg-gray-700'
+                  }`}
               >
                 <div
                   className="flex items-center space-x-2 flex-1"
@@ -1243,7 +1273,7 @@ function CodeEditor() {
             ))}
           </ul>
         </div>
-        
+
         {/* Editor and AI Chat */}
         <div className="flex-1 flex flex-col gap-6">
           {/* Code Editor */}
@@ -1256,7 +1286,7 @@ function CodeEditor() {
                 Language: {getLanguageFromExtension(activeFile?.name || '')}
               </span>
             </div>
-            <div 
+            <div
               className="flex-1 min-h-[400px] rounded-xl overflow-hidden border border-gray-700"
               onClick={() => {
                 if (monacoEditorRef.current) {
@@ -1299,19 +1329,17 @@ function CodeEditor() {
                 </button>
               </div>
             </div>
-            
+
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {chatMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex items-start space-x-3 ${
-                    msg.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''
-                  }`}
+                  className={`flex items-start space-x-3 ${msg.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''
+                    }`}
                 >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    msg.type === 'user' ? 'bg-sky-600' : 'bg-gray-700'
-                  }`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.type === 'user' ? 'bg-sky-600' : 'bg-gray-700'
+                    }`}>
                     {msg.type === 'user' ? (
                       <User className="h-4 w-4 text-white" />
                     ) : (
@@ -1319,11 +1347,10 @@ function CodeEditor() {
                     )}
                   </div>
                   <div className={`flex-1 ${msg.type === 'user' ? 'text-right' : ''}`}>
-                    <div className={`inline-block p-3 rounded-lg max-w-xs lg:max-w-md ${
-                      msg.type === 'user' 
-                        ? 'bg-sky-600 text-white' 
-                        : 'bg-gray-700 text-gray-100'
-                    }`}>
+                    <div className={`inline-block p-3 rounded-lg max-w-xs lg:max-w-md ${msg.type === 'user'
+                      ? 'bg-sky-600 text-white'
+                      : 'bg-gray-700 text-gray-100'
+                      }`}>
                       <div className="text-sm whitespace-pre-line">{msg.message}</div>
                       <div className="text-xs opacity-70 mt-1">
                         {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -1332,7 +1359,7 @@ function CodeEditor() {
                   </div>
                 </div>
               ))}
-              
+
               {/* Typing indicator */}
               {isTyping && (
                 <div className="flex items-start space-x-3">
@@ -1371,7 +1398,7 @@ function CodeEditor() {
                   <Send className="h-4 w-4" />
                 </button>
               </div>
-              
+
               {/* Quick Actions */}
               <div className="flex space-x-2 mt-2">
                 <button
@@ -1397,23 +1424,23 @@ function CodeEditor() {
           </div>
         </div>
       </div>
-       {/* ✅ Sidebar Chat */}
-       {/* ✅ Sidebar Chat */}
-      {isChatOpen && (
-        <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-lg border-l z-50 flex flex-col">
-          {/* Header */}
-          <div className="flex justify-between items-center p-3 border-b bg-purple-600 text-white">
-            <h2 className="font-semibold">Project Chat</h2>
-            <button onClick={() => setIsChatOpen(false)}>
-              <X size={20} />
-            </button>
-          </div>
-          {/* Chat Component */}
-          <Chat user={authUser} projectId={projectId} />
-        </div>
-      )}
+      {/* ✅ Sidebar Chat */}
+      {/* ✅ Sidebar Chat */}
+      {isChatOpen && (
+        <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-lg border-l z-50 flex flex-col">
+          {/* Header */}
+          <div className="flex justify-between items-center p-3 border-b bg-purple-600 text-white">
+            <h2 className="font-semibold">Project Chat</h2>
+            <button onClick={() => setIsChatOpen(false)}>
+              <X size={20} />
+            </button>
+          </div>
+          {/* Chat Component */}
+          <Chat user={authUser} projectId={projectId} />
+        </div>
+      )}
     </div>
-    
+
   );
 }
 
