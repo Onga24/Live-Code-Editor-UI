@@ -570,6 +570,7 @@ import { MessageSquare, X } from "lucide-react";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { getAIResponse } from "../lib/aiService";
+import { useLocation } from "react-router-dom";
 
 const FileTextIcon = () => (
   <svg
@@ -823,7 +824,11 @@ What specific coding help do you need?`;
 function CodeEditor() {
   const { authUser } = useContext(AuthContext);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const projectId = 'proj1'; // url
+  // const projectId = 'proj1'; // url
+  // 🟢 قراءة project_id من query params
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const projectId = params.get("project_id"); // هترجع "1" أو أي رقم
 
   const initialProject = {
     id: projectId,

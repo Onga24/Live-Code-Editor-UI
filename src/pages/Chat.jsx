@@ -17,6 +17,7 @@ const Chat = ({ user, projectId = null, chatRoom = 'general' }) => {
         try {
             let response;
             if (projectId) {
+                console.log("in fetch messages", projectId);
                 response = await axiosInstance.get(`/projects/${projectId}/messages`);
             } else {
                 response = await axiosInstance.get('/messages', {

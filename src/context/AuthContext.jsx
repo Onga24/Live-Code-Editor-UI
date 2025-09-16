@@ -42,7 +42,7 @@ const login = async (email, password) => {
   const res = await axiosInstance.post("/login", { email, password });
   localStorage.setItem("token", res.data.token);
 
-  const profileRes = await axiosInstance.get("/me");
+  const profileRes = await axiosInstance.get("/my-profile");
   setAuthUser(profileRes.data.user);
 };
 

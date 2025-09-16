@@ -3,6 +3,8 @@ import Pusher from 'pusher-js';
 
 window.Pusher = Pusher;
 
+console.log("in echo");
+console.log(localStorage.getItem('token'));
 window.Echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,
