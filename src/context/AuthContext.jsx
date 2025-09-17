@@ -59,6 +59,9 @@ const login = async (email, password) => {
       return authUser;
     }
 
+  const profileRes = await axiosInstance.get("/my-profile");
+  setAuthUser(profileRes.data.user);
+
     throw new Error("No token returned from server"); 
   } catch (err) {
     console.error("Login error:", err.response?.data);
