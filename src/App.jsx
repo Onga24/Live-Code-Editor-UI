@@ -14,6 +14,13 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import { ProtectedRoute, GuestRoute } from "./components/ProtectedRoute";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import NotAuthorized from "./pages/NotAuthorized";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import AdminUsersPage from './pages/Admin/AdminUsersPage'
+import AdminProjectsPage from './pages/Admin/AdminProjectsPage'
+import AdminLayout from './pages/Admin/AdminLayout';
+
 import CodeEditor from './pages/CodeEditor';
 
 
@@ -41,6 +48,21 @@ function App() {
           <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
           <Route path="/reset-password" element={<GuestRoute><ResetPasswordPage /></GuestRoute>} />
           <Route path="/otp" element={<GuestRoute><VerifyOtpPage /></GuestRoute>} />
+      {/* Admin Routes */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute role="admin">
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="users" element={<AdminUsersPage />} />
+        <Route path="projects" element={<AdminProjectsPage />} />
+      </Route>
+            {/* Not Authorized Page */}
+            <Route path="/not-authorized" element={<NotAuthorized />} />
 
         </Routes>
         </main>
