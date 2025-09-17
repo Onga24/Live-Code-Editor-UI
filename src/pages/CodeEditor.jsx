@@ -1,982 +1,8 @@
-// import React, { useState, useEffect, useRef, useContext } from 'react';
-// import { Send, Bot, User, Lightbulb, Bug, Code, Sparkles } from 'lucide-react';
-// import { AuthContext } from "../context/AuthContext"; // Add this import
-// import { set } from 'mongoose';
-
-// const FileTextIcon = () => (
-//   <svg
-//     xmlns="http://www.w3.org/2000/svg"
-//     width="24"
-//     height="24"
-//     viewBox="0 0 24 24"
-//     fill="none"
-//     stroke="currentColor"
-//     strokeWidth="2"
-//     strokeLinecap="round"
-//     strokeLinejoin="round"
-//     className="h-5 w-5"
-//   >
-//     <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-//     <polyline points="14 2 14 8 20 8" />
-//   </svg>
-// );
-
-// // Enhanced language detection with more file types
-// const getLanguageFromExtension = (filename) => {
-//   const extension = filename.split('.').pop()?.toLowerCase();
-//   const languageMap = {
-//     'html': 'html', 'htm': 'html', 'css': 'css', 'scss': 'scss', 'sass': 'sass',
-//     'less': 'less', 'js': 'javascript', 'jsx': 'javascript', 'ts': 'typescript',
-//     'tsx': 'typescript', 'json': 'json', 'xml': 'xml', 'py': 'python',
-//     'php': 'php', 'java': 'java', 'c': 'c', 'cpp': 'cpp', 'cs': 'csharp',
-//     'go': 'go', 'rs': 'rust', 'rb': 'ruby', 'swift': 'swift', 'kt': 'kotlin',
-//     'scala': 'scala', 'sh': 'shell', 'bash': 'shell', 'yml': 'yaml',
-//     'yaml': 'yaml', 'toml': 'toml', 'ini': 'ini', 'conf': 'ini',
-//     'md': 'markdown', 'markdown': 'markdown', 'tex': 'latex', 'sql': 'sql',
-//     'txt': 'plaintext', 'log': 'plaintext'
-//   };
-//   return languageMap[extension] || 'plaintext';
-// };
-
-// // Get default content based on file extension
-// const getDefaultContent = (filename) => {
-//   const extension = filename.split('.').pop()?.toLowerCase();
-//   const templates = {
-//     'html': '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Document</title>\n</head>\n<body>\n    <h1>Hello World!</h1>\n</body>\n</html>',
-//     'css': '/* Add your styles here */\nbody {\n    font-family: Arial, sans-serif;\n    margin: 0;\n    padding: 20px;\n}',
-//     'js': '// JavaScript code\nconsole.log("Hello World!");',
-//     'py': '# Python code\nprint("Hello World!")',
-//     'php': '<?php\n// PHP code\necho "Hello World!";\n?>',
-//     'md': '# Markdown Document\n\nWrite your content here...',
-//     'json': '{\n    "name": "example",\n    "version": "1.0.0"\n}'
-//   };
-//   return templates[extension] || '';
-// };
-
-// // AI Assistant responses based on code analysis
-// const getAIResponse = (message, currentFile, allFiles) => {
-//   const lowerMessage = message.toLowerCase();
-//   const fileExtension = currentFile?.name.split('.').pop()?.toLowerCase();
-//   const content = currentFile?.content || '';
-  
-//   if (lowerMessage.includes('tip') || lowerMessage.includes('hint')) {
-//     const tips = {
-//       'html': ["Use semantic HTML tags like <header>, <main>, <section> for better accessibility"],
-//       'css': ["Use CSS Grid or Flexbox for modern layouts"],
-//       'js': ["Use const/let instead of var for better scope control"],
-//       'py': ["Follow PEP 8 style guidelines for Python"]
-//     };
-//     const tipList = tips[fileExtension] || tips['js'];
-//     const randomTip = tipList[Math.floor(Math.random() * tipList.length)];
-//     return `💡 **${fileExtension?.toUpperCase() || 'Code'} Tip:** ${randomTip}`;
-//   }
-  
-//   if (lowerMessage.includes('analyze') || lowerMessage.includes('review')) {
-//     if (!content.trim()) {
-//       return "📝 Your file is empty. Start by adding some code and I'll help analyze it!";
-//     }
-//     return "🔍 **Code Analysis:**\n\nYour code structure looks good! Consider adding comments for better maintainability.";
-//   }
-  
-//   if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-//     return `👋 Hello! I'm your AI coding assistant. I can help you with code analysis, tips, debugging, and explanations.`;
-//   }
-  
-//   return `🤔 I'd love to help! Try asking me to analyze your current ${fileExtension?.toUpperCase() || 'code'} file or give you coding tips.`;
-// };
-
-// function CodeEditor() {
-//   const { apiRequest } = useContext(AuthContext); // Get apiRequest from context
-  
-//   const initialProject = {
-//     id: null, // Will be set from URL params
-//     title: 'Collaborative App',
-//     files: [
-//       { 
-//         id: 'file1', 
-//         name: 'index.html', 
-//         content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Hello World</title>\n</head>\n<body>\n    <div>\n        <h1>🚀 Welcome to the Code Editor!</h1>\n        <p>This is a collaborative coding environment.</p>\n    </div>\n</body>\n</html>' 
-//       },
-//     ]
-//   };
-
-//   const [project, setProject] = useState(initialProject);
-//   const [activeFileId, setActiveFileId] = useState(initialProject.files[0].id);
-//   const [status, setStatus] = useState('');
-//   const [isSaving, setIsSaving] = useState(false);
-//   const [isAddingFile, setIsAddingFile] = useState(false);
-//   const [newFileName, setNewFileName] = useState('');
-//   const [newFileExtension, setNewFileExtension] = useState('html');
-//   const [monacoLoaded, setMonacoLoaded] = useState(false);
-  
-//   // Chat-related state
-//   const [chatMessages, setChatMessages] = useState([
-//     {
-//       id: 1,
-//       type: 'ai',
-//       message: '👋 Hello! I\'m your AI coding assistant. How can I help you today?',
-//       timestamp: new Date()
-//     }
-//   ]);
-//   const [chatInput, setChatInput] = useState('');
-//   const [isTyping, setIsTyping] = useState(false);
-
-//   const activeFile = project.files.find(f => f.id === activeFileId);
-//   const editorRef = useRef(null);
-//   const monacoEditorRef = useRef(null);
-//   const monacoInstanceRef = useRef(null);
-//   const contentChangeTimeoutRef = useRef(null);
-//   const chatEndRef = useRef(null);
-
-//   // Get project ID from URL params
-//   useEffect(() => {
-//     const urlParams = new URLSearchParams(window.location.search);
-//     const projectId = urlParams.get('project_id');
-//     if (projectId) {
-//       setProject(prev => ({ ...prev, id: projectId }));
-//       loadProject(projectId);
-//     }
-//   }, []);
-
-// // Add this function inside your component, before the useEffect hooks
-// const registerCustomProviders = (monaco, language, files) => {
-//   // Register a simple auto-completion provider for all files
-//   monaco.languages.registerCompletionItemProvider(language, {
-//     provideCompletionItems: (model, position) => {
-//       // Get the word the user is currently typing
-//       const word = model.getWordUntilPosition(position);
-//       const range = new monaco.Range(
-//         position.lineNumber,
-//         word.startColumn,
-//         position.lineNumber,
-//         word.endColumn
-//       );
-
-//       // Create a list of suggestions based on existing files
-//       const suggestions = files.map(file => ({
-//         label: file.name,
-//         kind: monaco.languages.CompletionItemKind.File,
-//         documentation: `Project file: ${file.name}`,
-//         insertText: file.name,
-//         range: range,
-//       }));
-
-//       // You can add other static suggestions here
-//       suggestions.push({
-//         label: 'myCustomFunction',
-//         kind: monaco.languages.CompletionItemKind.Function,
-//         documentation: 'A project-specific function.',
-//         insertText: 'myCustomFunction()',
-//         range: range,
-//       });
-
-//       return {
-//         suggestions: suggestions,
-//       };
-//     },
-//   });
-
-//   // Register a simple hover provider for additional info on hover
-//   monaco.languages.registerHoverProvider(language, {
-//     provideHover: (model, position) => {
-//       // Get the word at the cursor position
-//       const word = model.getWordAtPosition(position);
-//       if (!word) {
-//         return null;
-//       }
-      
-//       // Check if the word is a file name and provide a tooltip
-//       const file = files.find(f => f.name === word.word);
-//       if (file) {
-//         return {
-//           contents: [{ value: `**File Content:**\n\n\`\`\`\n${file.content.substring(0, 50)}...\n\`\`\`` }]
-//         };
-//       }
-
-//       return null;
-//     }
-//   });
-// };
-
-// // Add this new useEffect hook
-// useEffect(() => {
-//   if (!monacoInstanceRef.current || !project.files || project.files.length === 0) {
-//     return;
-//   }
-
-//   // Clear any previously registered providers to prevent duplicates
-//   // This is a crucial step!
-//   monacoInstanceRef.current.languages.getLanguages().forEach(lang => {
-//     // You might need a more sophisticated way to unregister, but for
-//     // this simple case, re-registering can be enough.
-//   });
-
-//   const language = getLanguageFromExtension(activeFile.name);
-//   registerCustomProviders(monacoInstanceRef.current, language, project.files);
-
-// }, [monacoLoaded, project.files]); // The key dependency is project.files
-
-//   // Load Monaco Editor
-//   useEffect(() => {
-//     if (window.monaco) {
-//       monacoInstanceRef.current = window.monaco;
-//       setMonacoLoaded(true);
-//       return;
-//     }
-
-//     const script = document.createElement('script');
-//     script.src = "https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs/loader.js";
-//     script.async = true;
-//     script.onload = () => {
-//       window.require.config({ 
-//         paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs' } 
-//       });
-//       window.require(['vs/editor/editor.main'], function(monaco) {
-//         monacoInstanceRef.current = monaco;
-//         setMonacoLoaded(true);
-//       });
-//     };
-//     document.head.appendChild(script);
-
-//     return () => {
-//       if (script.parentNode) {
-//         script.parentNode.removeChild(script);
-//       }
-//     };
-//   }, []);
-
-//   // Initialize Monaco Editor
-//   useEffect(() => {
-//     if (!monacoLoaded || !editorRef.current || !monacoInstanceRef.current || monacoEditorRef.current) {
-//       return;
-//     }
-
-//     const language = getLanguageFromExtension(activeFile.name);
-//     monacoEditorRef.current = monacoInstanceRef.current.editor.create(editorRef.current, {
-//       value: activeFile.content,
-//       language: language,
-//       theme: 'vs-dark',
-//       automaticLayout: true,
-//       minimap: { enabled: true },
-//       fontSize: 14,
-//       wordWrap: 'on',
-//       lineNumbers: 'on',
-//     });
-//  if (monacoInstanceRef.current) {
-//       registerCustomProviders(monacoInstanceRef.current, language, project.files);
-//   }
-
-//     // Handle content changes with debouncing - FIXED VERSION
-//     const disposable = monacoEditorRef.current.onDidChangeModelContent(() => {
-//       if (contentChangeTimeoutRef.current) {
-//         clearTimeout(contentChangeTimeoutRef.current);
-//       }
-      
-//       // Capture the current active file ID when the change happens
-//       const currentActiveFileId = activeFileId;
-      
-//       contentChangeTimeoutRef.current = setTimeout(() => {
-//         if (monacoEditorRef.current) {
-//           const newCode = monacoEditorRef.current.getValue();
-//           setProject(prevProject => {
-//             const newFiles = prevProject.files.map(file =>
-//               file.id === currentActiveFileId ? { ...file, content: newCode } : file
-//             );
-//             return { ...prevProject, files: newFiles };
-//           });
-//         }
-//       }, 100);
-//     });
-
-//     setTimeout(() => {
-//       if (monacoEditorRef.current) {
-//         monacoEditorRef.current.focus();
-//       }
-//     }, 100);
-
-//     return () => {
-//       if (contentChangeTimeoutRef.current) {
-//         clearTimeout(contentChangeTimeoutRef.current);
-//       }
-//       disposable.dispose();
-//       if (monacoEditorRef.current) {
-//         monacoEditorRef.current.dispose();
-//         monacoEditorRef.current = null;
-//       }
-//     };
-//   }, [monacoLoaded, activeFileId]); // Added activeFileId dependency
-
-//   // Update editor when active file changes
-//   useEffect(() => {
-//     if (!monacoEditorRef.current || !activeFile) return;
-
-//     // Clear any pending content updates to prevent cross-file contamination
-//     if (contentChangeTimeoutRef.current) {
-//       clearTimeout(contentChangeTimeoutRef.current);
-//       contentChangeTimeoutRef.current = null;
-//     }
-
-//     const currentValue = monacoEditorRef.current.getValue();
-//     const newLanguage = getLanguageFromExtension(activeFile.name);
-    
-//     if (currentValue !== activeFile.content) {
-//       // Temporarily disable change events while updating content
-//       const model = monacoEditorRef.current.getModel();
-//       if (model) {
-//         // Save cursor position
-//         const position = monacoEditorRef.current.getPosition();
-        
-//         // Update content
-//         model.setValue(activeFile.content);
-        
-//         // Restore cursor position if valid
-//         if (position && position.lineNumber <= model.getLineCount()) {
-//           monacoEditorRef.current.setPosition(position);
-//         }
-//       }
-//     }
-    
-//     // Update language
-//     const model = monacoEditorRef.current.getModel();
-//     if (model && monacoInstanceRef.current) {
-//       monacoInstanceRef.current.editor.setModelLanguage(model, newLanguage);
-//     }
-
-//     // Focus editor after file switch
-//     setTimeout(() => {
-//       if (monacoEditorRef.current) {
-//         monacoEditorRef.current.focus();
-//       }
-//     }, 50);
-//   }, [activeFileId, activeFile]);
-
-//   // Load project from backend
-//   const loadProject = async (projectId) => {
-//     try {
-//       const response = await apiRequest(`/projects/${projectId}/files`, 'GET');
-      
-//       if (response.success && response.files) {
-//         const loadedFiles = response.files.map((file, index) => ({
-//           id: file.id ? `file${file.id}` : `file${index}`,
-//           name: file.name || file.original_name || `file${index}.txt`,
-//           content: file.content || getDefaultContent(file.name || file.original_name || 'file.txt')
-//         }));
-        
-//         setProject(prev => ({
-//           ...prev,
-//           id: projectId,
-//           title: response.project?.name || prev.title,
-//           files: loadedFiles.length > 0 ? loadedFiles : prev.files
-//         }));
-        
-//         if (loadedFiles.length > 0) {
-//           setActiveFileId(loadedFiles[0].id);
-//         }
-        
-//         setStatus('Project loaded successfully');
-//       } else {
-//         setStatus('Failed to load project files');
-//       }
-//     } catch (error) {
-//       console.error('Load error:', error);
-//       setStatus('Error loading project');
-//     }
-//     setTimeout(() => setStatus(''), 3000);
-//   };
-
-//   // Fixed save function
-//   const handleSave = async () => {
-//     if (!project.id) {
-//       setStatus('No project ID available');
-//       setTimeout(() => setStatus(''), 3000);
-//       return;
-//     }
-
-//     setIsSaving(true);
-//     setStatus('Saving...');
-    
-//     try {
-//       // Prepare files data for backend
-//       const filesData = project.files.map(file => ({
-//         name: file.name,
-//         content: file.content,
-//         // Include file ID if it exists for updates
-//         id: file.id?.toString().replace('file', '') || null
-//       }));
-
-//       const response = await apiRequest(`/projects/${project.id}/files`, 'POST', {
-//         files: filesData
-//       });
-      
-//       if (response.success) {
-//         // Update file IDs if new ones were created
-//         if (response.files) {
-//           setProject(prev => ({
-//             ...prev,
-//             files: prev.files.map((file, index) => {
-//               const backendFile = response.files[index];
-//               return {
-//                 ...file,
-//                 id: backendFile?.id ? `file${backendFile.id}` : file.id
-//               };
-//             })
-//           }));
-//         }
-        
-//         setStatus('Saved successfully!');
-//       } else {
-//         setStatus('Save failed: ' + (response.message || 'Unknown error'));
-//       }
-//     } catch (error) {
-//       console.error('Save error:', error);
-//       setStatus('Error saving project');
-//     } finally {
-//       setIsSaving(false);
-//       setTimeout(() => setStatus(''), 3000);
-//     }
-//   };
-
-//   const handleCreateFile = () => {
-//     if (!newFileName.trim()) return;
-
-//     const fullFileName = `${newFileName.trim()}.${newFileExtension}`;
-//     const newFile = {
-//       id: `file${Date.now()}`,
-//       name: fullFileName,
-//       content: getDefaultContent(fullFileName),
-//     };
-
-//     setProject(prevProject => ({
-//       ...prevProject,
-//       files: [...prevProject.files, newFile],
-//     }));
-
-//     handleFileSwitch(newFile.id); // Use the safe file switching function
-//     setIsAddingFile(false);
-//     setNewFileName('');
-//     setStatus(`Created ${fullFileName}`);
-//     setTimeout(() => setStatus(''), 2000);
-//   };
-// //    const handleDeleteFile = async (fileId) => {
-// //     if (!project.id) return;
-
-// //     const fileToDelete = project.files.find(f => f.id === fileId);
-// //     const backendFileId = fileId.toString().replace('file', '');
-
-// //     try {
-// //       const response = await apiRequest(`/projects/${project.id}/files/${backendFileId}`, 'DELETE');
-// //     //   const response = await apiRequest(`/projects/${project.id}/files/${numericFileId}`, 'DELETE');
-
-// //       if (response.success) {
-// //         setStatus('Deleting file...');
-// //         // Remove file from frontend state
-// //         setProject(prevProject => ({
-// //           ...prevProject,
-// //           files: prevProject.files.filter(file => file.id !== fileId)
-
-// //         }));
-
-// //         // Switch to another file if we deleted the active file
-// //         if (fileId === activeFileId) {
-// //           const remainingFiles = project.files.filter(file => file.id !== fileId);
-// //           if (remainingFiles.length > 0) {
-// //             handleFileSwitch(remainingFiles[0].id);
-// //           }
-// //         }
-
-// //         setStatus(`Deleted ${fileToDelete?.name || 'file'} successfully`);
-// //       } else {
-// //         setStatus('Delete failed: ' + (response.message || 'Unknown error'));
-// //       }
-// //     } catch (error) {
-// //       console.error('Delete error:', error);
-// //       setStatus('Error deleting file');
-// //     } finally {
-// //       setTimeout(() => setStatus(''), 3000);
-// //       setShowDeleteConfirm(null);
-// //     }
-// //   };
-
-  
-// //   const deleteFile = (fileId) => {
-// //     if (project.files.length <= 1) {
-// //       setStatus('Cannot delete the last file');
-// //       setTimeout(() => setStatus(''), 2000);
-// //       return;
-// //         setatus('Deleting file...');
-// //     }
-// // // const deleteFile = async (fileId) => {
-// // //     // If it's the last file, prevent deletion.
-// // //     if (project.files.length <= 1) {
-// // //         setStatus('Cannot delete the last file');
-// // //         setTimeout(() => setStatus(''), 2000);
-// // //         return;
-// // //     }
-
-// // //     setStatus('Deleting file...');
-
-// // //     try {
-// // //         // Extract the numeric ID from the fileId string (e.g., 'file123' -> '123').
-// // //         // This is necessary if your backend expects a numeric ID.
-// // //         const numericFileId = fileId.toString().replace('file', '');
-
-// // //         // Make an API call to the backend DELETE endpoint.
-// // //         const response = await apiRequest(`/projects/${project.id}/files/${numericFileId}`, 'DELETE');
-
-// // //         if (response.success) {
-// // //             // Update the local state to remove the file only after a successful API response.
-// // //             setProject(prev => ({
-// // //                 ...prev,
-// // //                 files: prev.files.filter(file => file.id !== fileId)
-// // //             }));
-// // //             setStatus('File deleted successfully!');
-// // //         } else {
-// // //             setStatus('Delete failed: ' + (response.message || 'Unknown error'));
-// // //         }
-// // //     } catch (error) {
-// // //         console.error('Delete error:', error);
-// // //         setStatus('Error deleting file');
-// // //     } finally {
-// // //         // Clear the status message after a short delay.
-// // //         setTimeout(() => setStatus(''), 3000);
-// // //     }
-// // // };
-
-// //     setProject(prevProject => {
-// //       const newFiles = prevProject.files.filter(file => file.id !== fileId);
-// //       return { ...prevProject, files: newFiles };
-// //     });
-
-// //     if (fileId === activeFileId) {
-// //       const remainingFiles = project.files.filter(file => file.id !== fileId);
-// //       setActiveFileId(remainingFiles[0].id);
-// //     }
-
-// //     setStatus('File deleted');
-// //     setTimeout(() => setStatus(''), 2000);
-// //   };
-
-
-//   // Chat functionality
-  
-// //   const deleteFile = async (fileId) => {
-// //     // If it's the last file, prevent deletion.
-// //     if (project.files.length <= 1) {
-// //         setStatus('Cannot delete the last file');
-// //         setTimeout(() => setStatus(''), 2000);
-// //         return;
-// //     }
-
-// //     setStatus('Deleting file...');
-
-// //     try {
-// //         // Extract the numeric ID from the fileId string (e.g., 'file123' -> '123').
-// //         // This is necessary if your backend expects a numeric ID.
-// //         const numericFileId = fileId.toString().replace('file', '');
-
-// //         // Make an API call to the backend DELETE endpoint.
-// //         const response = await apiRequest(`/projects/${project.id}/files/${numericFileId}`, 'DELETE');
-
-// //         if (response.success) {
-// //             // Update the local state to remove the file only after a successful API response.
-// //             setProject(prev => ({
-// //                 ...prev,
-// //                 files: prev.files.filter(file => file.id !== fileId)
-// //             }));
-// //             setStatus('File deleted successfully!');
-// //         } else {
-// //             setStatus('Delete failed: ' + (response.message || 'Unknown error'));
-// //         }
-// //     } catch (error) {
-// //         console.error('Delete error:', error);
-// //         setStatus('Error deleting file');
-// //     } finally {
-// //         // Clear the status message after a short delay.
-// //         setTimeout(() => setStatus(''), 3000);
-// //     }
-// // };
-// //  const handleDeleteFile = async (fileId) => {
-// //     if (!project.id) return;
-
-// //     const fileToDelete = project.files.find(f => f.id === fileId);
-// //     const backendFileId = fileId.toString().replace('file', '');
-
-// //     try {
-// //       const response = await apiRequest(`/projects/${project.id}/files/${backendFileId}`, 'DELETE');
-
-// //       if (response.success) {
-// //         // Remove file from frontend state
-// //         setProject(prevProject => ({
-// //           ...prevProject,
-// //           files: prevProject.files.filter(file => file.id !== fileId)
-// //         }));
-
-// //         // Switch to another file if we deleted the active file
-// //         if (fileId === activeFileId) {
-// //           const remainingFiles = project.files.filter(file => file.id !== fileId);
-// //           if (remainingFiles.length > 0) {
-// //             handleFileSwitch(remainingFiles[0].id);
-// //           }
-// //         }
-
-// //         setStatus(`Deleted ${fileToDelete?.name || 'file'} successfully`);
-// //       } else {
-// //         setStatus('Delete failed: ' + (response.message || 'Unknown error'));
-// //       }
-// //     } catch (error) {
-// //       console.error('Delete error:', error);
-// //       setStatus('Error deleting file');
-// //     } finally {
-// //       setTimeout(() => setStatus(''), 3000);
-// //       setShowDeleteConfirm(null);
-// //     }
-// //   };
-
-//   // File: CodeEditor.jsx
-
-// const deleteFile = async (fileId) => {
-//     // 1. Initial State & Safety Check
-//     if (project.files.length <= 1) {
-//         setStatus('Cannot delete the last file');
-//         setTimeout(() => setStatus(''), 2000);
-//         return;
-//     }
-//     setStatus('Deleting file...');
-
-//     try {
-//         // 2. Prepare and Send API Request
-//         // Your file IDs are like 'file123', so remove the 'file' prefix for the backend
-//         const numericFileId = fileId.toString().replace('file', '');
-
-//         const response = await apiRequest(`/projects/${project.id}/files/${numericFileId}`, 'DELETE');
-
-//         // 3. Handle a Successful Response
-//         if (response.success) {
-//             // Update the state using a functional update
-//             setProject(prevProject => {
-//                 // Filter out the deleted file to create a new array
-//                 const updatedFiles = prevProject.files.filter(file => file.id !== fileId);
-
-//                 // If the deleted file was the active one, switch to another file
-//                 let newActiveFileId = prevProject.activeFileId;
-//                 if (prevProject.activeFileId === fileId && updatedFiles.length > 0) {
-//                     newActiveFileId = updatedFiles[0].id;
-//                 }
-
-//                 // Return the new state object
-//                 return {
-//                     ...prevProject,
-//                     files: updatedFiles,
-//                     activeFileId: newActiveFileId
-//                 };
-//             });
-
-//             setStatus('File deleted successfully!');
-//         } else {
-//             // 4. Handle a Failed Response
-//             setStatus('Delete failed: ' + (response.message || 'Unknown error'));
-//         }
-//     } catch (error) {
-//         // 5. Handle Network or Unexpected Errors
-//         console.error('Delete error:', error);
-//         setStatus('Error deleting file');
-//     } finally {
-//         // 6. Clean Up
-//         setTimeout(() => setStatus(''), 3000);
-//     }
-// };
-//   const handleSendMessage = async () => {
-//     if (!chatInput.trim()) return;
-
-//     const userMessage = {
-//       id: Date.now(),
-//       type: 'user',
-//       message: chatInput,
-//       timestamp: new Date()
-//     };
-
-//     setChatMessages(prev => [...prev, userMessage]);
-//     setChatInput('');
-//     setIsTyping(true);
-
-//     setTimeout(() => {
-//       const aiResponse = getAIResponse(chatInput, activeFile, project.files);
-//       const aiMessage = {
-//         id: Date.now() + 1,
-//         type: 'ai',
-//         message: aiResponse,
-//         timestamp: new Date()
-//       };
-
-//       setChatMessages(prev => [...prev, aiMessage]);
-//       setIsTyping(false);
-//     }, 1000);
-//   };
-
-//   // Save current file content before switching
-//   const handleFileSwitch = (newFileId) => {
-//     // Save current file content if Monaco editor exists
-//     if (monacoEditorRef.current && activeFileId !== newFileId) {
-//       const currentContent = monacoEditorRef.current.getValue();
-//       setProject(prevProject => {
-//         const newFiles = prevProject.files.map(file =>
-//           file.id === activeFileId ? { ...file, content: currentContent } : file
-//         );
-//         return { ...prevProject, files: newFiles };
-//       });
-      
-//       // Clear any pending timeouts
-//       if (contentChangeTimeoutRef.current) {
-//         clearTimeout(contentChangeTimeoutRef.current);
-//         contentChangeTimeoutRef.current = null;
-//       }
-//     }
-    
-//     setActiveFileId(newFileId);
-//   };
-
-//   // Auto-scroll chat
-//   useEffect(() => {
-//     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-//   }, [chatMessages]);
-
-//   return (
-//     <div className="min-h-screen bg-gray-900 text-gray-200 p-4 md:p-8 flex flex-col">
-//       {/* Header */}
-//       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-//         <h1 className="text-3xl font-bold text-gray-50">
-//           <span className="text-sky-400">Project:</span> {project.title}
-//         </h1>
-//         <div className="flex items-center space-x-4">
-//           <span className={`text-sm px-3 py-1 rounded-full ${
-//             status.includes('Saved') || status.includes('loaded') ? 'bg-green-900 text-green-200' :
-//             status.includes('Created') ? 'bg-blue-900 text-blue-200' :
-//             status.includes('deleted') ? 'bg-red-900 text-red-200' :
-//             status.includes('Error') || status.includes('failed') ? 'bg-red-900 text-red-200' :
-//             'text-gray-400'
-//           }`}>
-//             {status || 'Ready'}
-//           </span>
-//           <button
-//             onClick={handleSave}
-//             disabled={isSaving || !project.id}
-//             className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-//               isSaving || !project.id
-//                 ? 'bg-gray-600 cursor-not-allowed' 
-//                 : 'bg-green-600 hover:bg-green-700 hover:shadow-lg transform hover:scale-105'
-//             }`}
-//           >
-//             {isSaving ? 'Saving...' : 'Save Project'}
-//           </button>
-          
-//         </div>
-//       </div>
-
-//       <div className="flex-1 flex flex-col lg:flex-row gap-6">
-//         {/* File Explorer */}
-//         <div className="lg:w-1/4 bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-700">
-//           <div className="flex justify-between items-center mb-4">
-//             <h3 className="text-lg font-semibold text-gray-50">Files</h3>
-//             <button
-//               onClick={() => setIsAddingFile(true)}
-//               className="px-3 py-1 bg-sky-600 text-white rounded-lg text-sm hover:bg-sky-700 transition-all transform hover:scale-105"
-//             >
-//               + New File
-//             </button>
-            
-//           </div>
-
-//           {/* Add File Form */}
-//           {isAddingFile && (
-//             <div className="flex flex-col space-y-3 mb-4 p-3 bg-gray-700 rounded-lg">
-//               <input
-//                 type="text"
-//                 placeholder="Enter file name"
-//                 value={newFileName}
-//                 onChange={(e) => setNewFileName(e.target.value)}
-//                 className="w-full p-2 bg-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-//                 onKeyPress={(e) => e.key === 'Enter' && handleCreateFile()}
-//               />
-//               <select
-//                 value={newFileExtension}
-//                 onChange={(e) => setNewFileExtension(e.target.value)}
-//                 className="w-full p-2 bg-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-//               >
-//                 <option value="html">.html</option>
-//                 <option value="css">.css</option>
-//                 <option value="js">.js</option>
-//                 <option value="ts">.ts</option>
-//                 <option value="jsx">.jsx</option>
-//                 <option value="py">.py</option>
-//                 <option value="php">.php</option>
-//                 <option value="java">.java</option>
-//                 <option value="cpp">.cpp</option>
-//                 <option value="md">.md</option>
-//                 <option value="json">.json</option>
-//                 <option value="txt">.txt</option>
-//               </select>
-//               <div className="flex space-x-2">
-//                 <button
-//                   onClick={handleCreateFile}
-//                   className="flex-1 p-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-all"
-//                 >
-//                   Create
-//                 </button>
-//                 <button
-//                   onClick={() => {
-//                     setIsAddingFile(false);
-//                     setNewFileName('');
-//                   }}
-//                   className="flex-1 p-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-all"
-//                 >
-//                   Cancel
-//                 </button>
-//               </div>
-//             </div>
-//           )}
-
-//           {/* File List */}
-//           <ul className="space-y-2">
-//             {project.files.map(file => (
-//               <li
-//                 key={file.id}
-//                 className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
-//                   file.id === activeFileId 
-//                     ? 'bg-sky-600 text-white shadow-lg' 
-//                     : 'hover:bg-gray-700'
-//                 }`}
-//               >
-//                 <div
-//                   className="flex items-center space-x-2 flex-1"
-//                   onClick={() => handleFileSwitch(file.id)}
-//                 >
-//                   <FileTextIcon />
-//                   <span className="truncate">{file.name}</span>
-//                 </div>
-//                 {project.files.length > 1 && (
-//                   <button
-//                     onClick={(e) => {
-//                       e.stopPropagation();
-//                     deleteFile(file.id);
-//                     // handleDeleteFile(file.id);
-//                     }}
-//                     className="ml-2 text-red-400 hover:text-red-300 transition-colors"
-//                     title="Delete file"
-//                   >
-//                     ✕
-//                   </button>
-//                 )}
-//               </li>
-//             ))}
-//           </ul>
-//         </div>
-        
-//         {/* Editor and AI Chat */}
-//         <div className="flex-1 flex flex-col gap-6">
-//           {/* Code Editor */}
-//           <div className="flex-1 flex flex-col min-h-0">
-//             <div className="flex justify-between items-center mb-3">
-//               <label className="text-lg font-semibold text-gray-50">
-//                 Code Editor: {activeFile?.name}
-//               </label>
-//               <span className="text-sm text-gray-400">
-//                 Language: {getLanguageFromExtension(activeFile?.name || '')}
-//               </span>
-//             </div>
-//             <div className="flex-1 min-h-[400px] rounded-xl overflow-hidden border border-gray-700">
-//               <div ref={editorRef} className="w-full h-full" />
-//             </div>
-//           </div>
-
-//           {/* AI Chat Assistant */}
-//           <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 flex flex-col" style={{ height: '300px' }}>
-//             <div className="flex items-center justify-between p-4 border-b border-gray-700">
-//               <div className="flex items-center space-x-2">
-//                 <Bot className="h-6 w-6 text-sky-400" />
-//                 <h3 className="text-lg font-semibold text-gray-50">AI Assistant</h3>
-//               </div>
-//             </div>
-            
-//             {/* Chat Messages */}
-//             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-//               {chatMessages.map((msg) => (
-//                 <div
-//                   key={msg.id}
-//                   className={`flex items-start space-x-3 ${
-//                     msg.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''
-//                   }`}
-//                 >
-//                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-//                     msg.type === 'user' ? 'bg-sky-600' : 'bg-gray-700'
-//                   }`}>
-//                     {msg.type === 'user' ? (
-//                       <User className="h-4 w-4 text-white" />
-//                     ) : (
-//                       <Bot className="h-4 w-4 text-sky-400" />
-//                     )}
-//                   </div>
-//                   <div className="flex-1">
-//                     <div className={`inline-block p-3 rounded-lg max-w-xs lg:max-w-md ${
-//                       msg.type === 'user' 
-//                         ? 'bg-sky-600 text-white' 
-//                         : 'bg-gray-700 text-gray-100'
-//                     }`}>
-//                       <div className="text-sm whitespace-pre-line">{msg.message}</div>
-//                       <div className="text-xs opacity-70 mt-1">
-//                         {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               ))}
-              
-//               {isTyping && (
-//                 <div className="flex items-start space-x-3">
-//                   <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-//                     <Bot className="h-4 w-4 text-sky-400" />
-//                   </div>
-//                   <div className="bg-gray-700 p-3 rounded-lg">
-//                     <div className="flex space-x-1">
-//                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-//                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-//                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               )}
-//               <div ref={chatEndRef} />
-//             </div>
-
-//             {/* Chat Input */}
-//             <div className="p-4 border-t border-gray-700">
-//               <div className="flex space-x-2">
-//                 <input
-//                   type="text"
-//                   value={chatInput}
-//                   onChange={(e) => setChatInput(e.target.value)}
-//                   onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-//                   placeholder="Ask me about your code..."
-//                   className="flex-1 p-2 bg-gray-700 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-//                   disabled={isTyping}
-//                 />
-//                 <button
-//                   onClick={handleSendMessage}
-//                   disabled={!chatInput.trim() || isTyping}
-//                   className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed"
-//                 >
-//                   <Send className="h-4 w-4" />
-//                 </button>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default CodeEditor;
-
+import { MessageSquare, X } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import Chat from './Chat';
+import ChatAssistant from './ChatAssistant';
+import { getLanguageFromExtension, getDefaultContent , FileTextIcon} from "../lib/codeUtils.jsx"; // هنفصل uti
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Send, Bot, User, Lightbulb, Bug, Code, Upload, Trash2, X } from 'lucide-react';
 import { AuthContext } from "../context/AuthContext"; // Add this import
@@ -1031,38 +57,6 @@ const getDefaultContent = (filename) => {
   return templates[extension] || '';
 };
 
-// AI Assistant responses based on code analysis
-// const getAIResponse = (message, currentFile, allFiles) => {
-//   const lowerMessage = message.toLowerCase();
-//   const fileExtension = currentFile?.name.split('.').pop()?.toLowerCase();
-//   const content = currentFile?.content || '';
-  
-//   if (lowerMessage.includes('tip') || lowerMessage.includes('hint')) {
-//     const tips = {
-//       'html': ["Use semantic HTML tags like <header>, <main>, <section> for better accessibility"],
-//       'css': ["Use CSS Grid or Flexbox for modern layouts"],
-//       'js': ["Use const/let instead of var for better scope control"],
-//       'py': ["Follow PEP 8 style guidelines for Python"]
-//     };
-//     const tipList = tips[fileExtension] || tips['js'];
-//     const randomTip = tipList[Math.floor(Math.random() * tipList.length)];
-//     return `💡 **${fileExtension?.toUpperCase() || 'Code'} Tip:** ${randomTip}`;
-//   }
-  
-//   if (lowerMessage.includes('analyze') || lowerMessage.includes('review')) {
-//     if (!content.trim()) {
-//       return "📝 Your file is empty. Start by adding some code and I'll help analyze it!";
-//     }
-//     return "🔍 **Code Analysis:**\n\nYour code structure looks good! Consider adding comments for better maintainability.";
-//   }
-  
-//   if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-//     return `👋 Hello! I'm your AI coding assistant. I can help you with code analysis, tips, debugging, and explanations.`;
-//   }
-  
-//   return `🤔 I'd love to help! Try asking me to analyze your current ${fileExtension?.toUpperCase() || 'code'} file or give you coding tips.`;
-// };
-
 function CodeEditor() {
   const { apiRequest } = useContext(AuthContext); // Get apiRequest from context
   
@@ -1074,6 +68,11 @@ function CodeEditor() {
         id: 'file1', 
         name: 'index.html', 
         content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Hello World</title>\n</head>\n<body>\n    <div>\n        <h1>🚀 Welcome to the Code Editor!</h1>\n        <p>This is a collaborative coding environment.</p>\n    </div>\n</body>\n</html>' 
+
+
+
+
+ 
       },
     ]
   };
@@ -1093,7 +92,7 @@ function CodeEditor() {
   const [showAiSuggestions, setShowAiSuggestions] = useState(false);
   const [isLoadingAi, setIsLoadingAi] = useState(false);
   const [selectedText, setSelectedText] = useState('');
-  
+  const [isChatOpen, setIsChatOpen] = useState(false);
   // Chat-related state
   const [chatMessages, setChatMessages] = useState([
     {
@@ -1105,6 +104,7 @@ function CodeEditor() {
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+
 
   const activeFile = project.files.find(f => f.id === activeFileId);
   const editorRef = useRef(null);
@@ -1123,6 +123,7 @@ function CodeEditor() {
     }
   }, []);
 
+
   // Load Monaco Editor
   useEffect(() => {
     if (window.monaco) {
@@ -1135,10 +136,10 @@ function CodeEditor() {
     script.src = "https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs/loader.js";
     script.async = true;
     script.onload = () => {
-      window.require.config({ 
-        paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs' } 
+      window.require.config({
+        paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs' }
       });
-      window.require(['vs/editor/editor.main'], function(monaco) {
+      window.require(['vs/editor/editor.main'], function (monaco) {
         monacoInstanceRef.current = monaco;
         setMonacoLoaded(true);
       });
@@ -1200,6 +201,7 @@ function CodeEditor() {
       // Capture the current active file ID when the change happens
       const currentActiveFileId = activeFileId;
       
+
       contentChangeTimeoutRef.current = setTimeout(() => {
         if (monacoEditorRef.current) {
           const newCode = monacoEditorRef.current.getValue();
@@ -1254,7 +256,7 @@ function CodeEditor() {
 
     const currentValue = monacoEditorRef.current.getValue();
     const newLanguage = getLanguageFromExtension(activeFile.name);
-    
+
     if (currentValue !== activeFile.content) {
       // Temporarily disable change events while updating content
       const model = monacoEditorRef.current.getModel();
@@ -1273,6 +275,7 @@ function CodeEditor() {
     }
     
     // Update language
+
     const model = monacoEditorRef.current.getModel();
     if (model && monacoInstanceRef.current) {
       monacoInstanceRef.current.editor.setModelLanguage(model, newLanguage);
@@ -1455,6 +458,7 @@ const handleFileUpload = async (event) => {
         setStatus(`Uploaded ${newFiles.length} file(s) successfully. Skipped duplicates: ${duplicateFileNames.join(', ')}`);
       } else {
         setStatus(`Uploaded ${newFiles.length} file(s) successfully!`);
+
       }
 
       scrollToTop();
@@ -1953,10 +957,9 @@ const scrollToTop = () => {
                 : 'bg-green-600 hover:bg-green-700 hover:shadow-lg transform hover:scale-105'
             }`}
           >
-            {isSaving ? 'Saving...' : 'Save Project'}
+            + New File
           </button>
         </div>
-      </div>
 
       <div className="flex-1 flex flex-col lg:flex-row gap-6">
         {/* File Explorer */}
@@ -2215,9 +1218,27 @@ const scrollToTop = () => {
 
          
         </div>
+
+        {/* AI Chat Assistant */}
+        <ChatAssistant />
       </div>
     </div>
-  );
-}
 
+    {/* Sidebar Chat */}
+    {isChatOpen && (
+      <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-lg border-l z-50 flex flex-col">
+        {/* Header */}
+        <div className="flex justify-between items-center p-3 border-b bg-purple-600 text-white">
+          <h2 className="font-semibold">Project Chat</h2>
+          <button onClick={() => setIsChatOpen(false)}>
+            <X size={20} />
+          </button>
+        </div>
+        {/* Chat Component */}
+        <Chat user={authUser} projectId={projectId} />
+      </div>
+    )}
+  </div>
+);
+}
 export default CodeEditor;

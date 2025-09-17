@@ -9,8 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
-  //  check auth user
-  // apiRequest function
+  // helper generic request
   const apiRequest = async (url, method = "GET", data = null) => {
     try {
       const res = await axiosInstance({ url, method, data });
@@ -20,14 +19,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ✅ check auth user
   const checkAuth = async () => {
     setLoadingAuth(true);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setAuthUser(null);
+      setLoadingAuth(false);
+      return;
+    }
+
     try {
-      const res = await axiosInstance.get("/my-profile");
+      const res = await axiosInstance.get("/my-profile"); 
       setAuthUser(res.data.user);
     } catch (err) {
       setAuthUser(null);
+      localStorage.removeItem("token");
     } finally {
       setLoadingAuth(false);
     }
@@ -37,23 +43,48 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-// login
 const login = async (email, password) => {
-  const res = await axiosInstance.post("/login", { email, password });
-  localStorage.setItem("token", res.data.token);
+  try {
+    const res = await axiosInstance.post("/login", { email, password });
 
-  const profileRes = await axiosInstance.get("/me");
+    if (res?.data?.token) {
+      localStorage.setItem("token", res.data.token);
+
+      if (res.data.user) {
+        setAuthUser(res.data.user);
+        return res.data.user; 
+      }
+
+      await checkAuth();
+      return authUser;
+    }
+
+  const profileRes = await axiosInstance.get("/my-profile");
   setAuthUser(profileRes.data.user);
+
+    throw new Error("No token returned from server"); 
+  } catch (err) {
+    console.error("Login error:", err.response?.data);
+    throw err; 
+  }
 };
 
-  // logout
+
+
+
+
+
+
   const logout = async () => {
-    await axiosInstance.post("/logout");
-    localStorage.removeItem("token");
-    setAuthUser(null);
+    try {
+      await axiosInstance.post("/logout");
+    } catch (err) {
+    } finally {
+      localStorage.removeItem("token");
+      setAuthUser(null);
+    }
   };
 
-  //  update profile
   const updateProfile = async (formData) => {
     setIsUpdatingProfile(true);
     try {
@@ -63,10 +94,13 @@ const login = async (email, password) => {
 
       if (res.data.status === 200) {
         toast.success(res.data.message || "Profile updated!");
-        setAuthUser((prev) => ({
-          ...prev,
-          ...res.data.user,
-        }));
+        // backend returns user object in res.data.user or res.data.user: { name, profile_picture }
+        // to be safe, merge whatever returned
+        if (res.data.user) {
+          setAuthUser((prev) => ({ ...prev, ...res.data.user }));
+        } else {
+          await checkAuth();
+        }
         return { success: true };
       } else {
         return { success: false, errors: res.data.errors };
@@ -99,7 +133,4 @@ const login = async (email, password) => {
     </AuthContext.Provider>
   );
 };
-
-
-
 
