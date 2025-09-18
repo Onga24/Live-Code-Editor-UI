@@ -1,5 +1,5 @@
-import { MessageSquare, X } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { MessageSquare} from "lucide-react";
+// import { useLocation } from "react-router-dom";
 import Chat from './Chat';
 import ChatAssistant from './ChatAssistant';
 import { getLanguageFromExtension, getDefaultContent , FileTextIcon} from "../lib/codeUtils.jsx"; // هنفصل uti
@@ -7,59 +7,15 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Send, Bot, User, Lightbulb, Bug, Code, Upload, Trash2, X } from 'lucide-react';
 import { AuthContext } from "../context/AuthContext"; // Add this import
 import { v4 as uuidv4 } from 'uuid';
-const FileTextIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="h-5 w-5"
-  >
-    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-    <polyline points="14 2 14 8 20 8" />
-  </svg>
-);
-
-// Enhanced language detection with more file types
-const getLanguageFromExtension = (filename) => {
-  const extension = filename.split('.').pop()?.toLowerCase();
-  const languageMap = {
-    'html': 'html', 'htm': 'html', 'css': 'css', 'scss': 'scss', 'sass': 'sass',
-    'less': 'less', 'js': 'javascript', 'jsx': 'javascript', 'ts': 'typescript',
-    'tsx': 'typescript', 'json': 'json', 'xml': 'xml', 'py': 'python',
-    'php': 'php', 'java': 'java', 'c': 'c', 'cpp': 'cpp', 'cs': 'csharp',
-    'go': 'go', 'rs': 'rust', 'rb': 'ruby', 'swift': 'swift', 'kt': 'kotlin',
-    'scala': 'scala', 'sh': 'shell', 'bash': 'shell', 'yml': 'yaml',
-    'yaml': 'yaml', 'toml': 'toml', 'ini': 'ini', 'conf': 'ini',
-    'md': 'markdown', 'markdown': 'markdown', 'tex': 'latex', 'sql': 'sql',
-    'txt': 'plaintext', 'log': 'plaintext'
-  };
-  return languageMap[extension] || 'plaintext';
-};
-
-// Get default content based on file extension
-const getDefaultContent = (filename) => {
-  const extension = filename.split('.').pop()?.toLowerCase();
-  const templates = {
-    'html': '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Document</title>\n</head>\n<body>\n    <h1>Hello World!</h1>\n</body>\n</html>',
-    'css': '/* Add your styles here */\nbody {\n    font-family: Arial, sans-serif;\n    margin: 0;\n    padding: 20px;\n}',
-    'js': '// JavaScript code\nconsole.log("Hello World!");',
-    'py': '# Python code\nprint("Hello World!")',
-    'php': '<?php\n// PHP code\necho "Hello World!";\n?>',
-    'md': '# Markdown Document\n\nWrite your content here...',
-    'json': '{\n    "name": "example",\n    "version": "1.0.0"\n}'
-  };
-  return templates[extension] || '';
-};
+import { useLocation } from "react-router-dom";
 
 function CodeEditor() {
   const { apiRequest } = useContext(AuthContext); // Get apiRequest from context
-  
+    const { authUser } = useContext(AuthContext);
+ 
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const projectId = params.get("project_id"); // هترجع "1" أو أي رقم
   const initialProject = {
     id: null, // Will be set from URL params
     title: 'Collaborative App',
@@ -93,7 +49,6 @@ function CodeEditor() {
   const [isLoadingAi, setIsLoadingAi] = useState(false);
   const [selectedText, setSelectedText] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
-  // Chat-related state
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
@@ -168,7 +123,7 @@ function CodeEditor() {
     monacoEditorRef.current = monacoInstanceRef.current.editor.create(editorRef.current, {
       value: activeFile.content,
       language: language,
-      theme: 'vs-dark',
+      theme: 'hc-black',
       automaticLayout: true,
       minimap: { enabled: true },
       fontSize: 14,
@@ -931,292 +886,572 @@ const scrollToTop = () => {
     setAiSuggestions([]);
   };
 
-  return (
-       <div className="min-h-screen bg-dark-gray text-gray-200 p-4 md:p-8 flex flex-col " style={{backgroundColor:'#101828'}}>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-        <h1 className="text-3xl font-bold text-gray-50">
-          <span className="text-sky-400">Project:</span> {project.title}
-        </h1>
+//   return (
+//        <div className="min-h-screen bg-dark-gray text-gray-200 p-4 md:p-8 flex flex-col " style={{backgroundColor:'#101828'}}>
+//       {/* Header */}
+//       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+//         <h1 className="text-3xl font-bold text-gray-50">
+//           <span className="text-sky-400">Project:</span> {project.title}
+//         </h1>
+//         <div className="flex items-center space-x-4">
+//           <span className={`text-sm px-3 py-1 rounded-full ${
+//             status.includes('Saved') || status.includes('loaded') ? 'bg-green-900 text-green-200' :
+//             status.includes('Created') ? 'bg-blue-900 text-blue-200' :
+//             status.includes('deleted') ? 'bg-red-900 text-red-200' :
+//             status.includes('Error') || status.includes('failed') ? 'bg-red-900 text-red-200' :
+//             'text-gray-400'
+//           }`}>
+//             {status || 'Ready'}
+//           </span>
+//           <button
+//             onClick={handleSave} 
+//             disabled={isSaving || !project.id}
+//             className={`px-6 py-2 rounded-lg font-semibold transition-all ${
+//               isSaving || !project.id
+//                 ? 'bg-gray-600 cursor-not-allowed' 
+//                 : 'bg-green-600 hover:bg-green-700 hover:shadow-lg transform hover:scale-105'
+//             }`}
+//           >
+//             + New File
+//           </button>
+//         </div>
+
+//       <div className="flex-1 flex flex-col lg:flex-row gap-6">
+//         {/* File Explorer */}
+//         <div className="lg:w-1/4 bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-700">
+//           <div className="flex justify-between items-center mb-4">
+//             <h3 className="text-lg font-semibold text-gray-50">Files</h3>
+//             <div className="flex space-x-2">
+//               <button
+//                 onClick={() => setIsAddingFile(true)}
+//                 className="px-2 py-1 bg-sky-600 text-white rounded-lg text-sm hover:bg-sky-700 transition-all"
+//                 title="Create New File"
+//               >
+//                 + New
+//               </button>
+              
+//               <label className="px-2 py-1 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-all cursor-pointer">
+//                 <Upload className="h-4 w-4 inline mr-1" />
+//                 Upload
+//                 <input
+//                   type="file"
+//                   multiple
+//                   onChange={handleFileUpload}
+//                   className="hidden"
+//                   disabled={isUploading || !project.id}
+//                 />
+//               </label>
+              
+//               {selectedFiles.length > 0 && (
+//                 <button
+//                   onClick={handleDeleteMultipleFiles}
+//                   className="px-2 py-1 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-all"
+//                   title={`Delete ${selectedFiles.length} selected file(s)`}
+//                 >
+//                   <Trash2 className="h-4 w-4" />
+//                 </button>
+//               )}
+//             </div>
+//           </div>
+
+//           {/* File selection controls */}
+//           {project.files.length > 1 && (
+//             <div className="flex justify-between items-center mb-3 text-sm text-gray-400">
+//               <span>{selectedFiles.length} selected</span>
+//               <div className="space-x-2">
+//                 <button
+//                   onClick={() => setSelectedFiles(project.files.map(f => f.id))}
+//                   className="hover:text-sky-400"
+//                 >
+//                   Select All
+//                 </button>
+//                 <button
+//                   onClick={() => setSelectedFiles([])}
+//                   className="hover:text-sky-400"
+//                 >
+//                   Clear
+//                 </button>
+//               </div>
+//             </div>
+//           )}
+
+//           {/* Add File Form */}
+//           {isAddingFile && (
+//             <div className="flex flex-col space-y-3 mb-4 p-3 bg-gray-700 rounded-lg">
+//               <input
+//                 type="text"
+//                 placeholder="Enter file name"
+//                 value={newFileName}
+//                 onChange={(e) => setNewFileName(e.target.value)}
+//                 className="w-full p-2 bg-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+//                 onKeyPress={(e) => e.key === 'Enter' && handleCreateFile()}
+//               />
+//               <select
+//                 value={newFileExtension}
+//                 onChange={(e) => setNewFileExtension(e.target.value)}
+//                 className="w-full p-2 bg-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+//               >
+//                 <option value="html">.html</option>
+//                 <option value="css">.css</option>
+//                 <option value="js">.js</option>
+//                 <option value="ts">.ts</option>
+//                 <option value="jsx">.jsx</option>
+//                 <option value="py">.py</option>
+//                 <option value="php">.php</option>
+//                 <option value="java">.java</option>
+//                 <option value="cpp">.cpp</option>
+//                 <option value="md">.md</option>
+//                 <option value="json">.json</option>
+//                 <option value="txt">.txt</option>
+//               </select>
+//               <div className="flex space-x-2">
+//                 <button
+//                   onClick={handleCreateFile}
+//                   className="flex-1 p-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-all"
+//                 >
+//                   Create
+//                 </button>
+//                 <button
+//                   onClick={() => {
+//                     setIsAddingFile(false);
+//                     setNewFileName('');
+//                   }}
+//                   className="flex-1 p-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-all"
+//                 >
+//                   Cancel
+//                 </button>
+//               </div>
+//             </div>
+//           )}
+
+//            {/* File List */}
+//     <ul className="space-y-2">
+//       {project.files.map(file => (
+//         <li
+//           key={file.id}
+//           className={`flex items-center p-3 rounded-lg cursor-pointer transition-all ${
+//             file.id === activeFileId
+//               ? 'bg-sky-600 text-white shadow-lg'
+//               : selectedFiles.includes(file.id)
+//               ? 'bg-gray-700 ring-2 ring-sky-500'
+//               : 'hover:bg-gray-700'
+//           }`}
+//         >
+//           {/* File selection checkbox */}
+//           <div className="flex items-center mr-2">
+//             <input
+//               type="checkbox"
+//               checked={selectedFiles.includes(file.id)}
+//               onChange={(e) => {
+//                 if (e.target.checked) {
+//                   setSelectedFiles([...selectedFiles, file.id]);
+//                 } else {
+//                   setSelectedFiles(selectedFiles.filter(id => id !== file.id));
+//                 }
+//               }}
+//               className="rounded"
+//               onClick={(e) => e.stopPropagation()}
+//             />
+//           </div>
+
+//           <div
+//             className="flex items-center space-x-2 flex-1"
+//             onClick={() => handleFileSwitch(file.id)}
+//           >
+//             <FileTextIcon />
+//             <span className="truncate">{file.name}</span>
+//           </div>
+
+//           {project.files.length > 1 && (
+//             <button
+//               onClick={(e) => {
+//                 e.stopPropagation();
+//                 setShowDeleteConfirm(file.id);
+//                 // deleteFile(file.id);
+//                 handleDeleteFile(file.id);
+//               }}
+//               className="ml-2 text-red-400 hover:text-red-300 transition-colors"
+//               title="Delete file"
+//             >
+//               ✕
+//             </button>
+//           )}
+//         </li>
+//       ))}
+//     </ul>
+//     {/* Remove the malformed tag here */}
+// </div>
+//         {/* Editor */}
+//         <div className="flex-1 flex flex-col gap-6">
+//           {/* Code Editor */}
+//           <div className="flex-1 flex flex-col min-h-0">
+//             <div className="flex justify-between items-center mb-3">
+//               <label className="text-lg font-semibold text-gray-50">
+//                 Code Editor: {activeFile?.name}
+//               </label>
+//               <div className="flex items-center space-x-2">
+//                 <span className="text-sm text-gray-400">
+//                   Language: {getLanguageFromExtension(activeFile?.name || '')}
+//                 </span>
+                
+//                 {/* AI Toolbar */}
+//                 {/* <div className="flex space-x-1">
+//                   <button
+//                     onClick={handleAiCompletion}
+//                     disabled={isLoadingAi}
+//                     className="px-3 py-1 bg-purple-600 text-white rounded text-xs hover:bg-purple-700 disabled:opacity-50 transition-all"
+//                     title="AI Completion (Ctrl+Space)"
+//                   >
+//                     {isLoadingAi ? '...' : '🤖 Complete'}
+//                   </button>
+//                   <button
+//                     onClick={handleAiImprove}
+//                     disabled={isLoadingAi}
+//                     className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 disabled:opacity-50 transition-all"
+//                     title="AI Improve (Ctrl+Shift+I)"
+//                   >
+//                     ✨ Improve
+//                   </button>
+//                 </div> */}
+//               </div>
+//             </div>
+            
+//             {/* AI Suggestions Panel */}
+//             {showAiSuggestions && aiSuggestions.length > 0 && (
+//               <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-3 max-h-64 overflow-y-auto">
+//                 <div className="flex justify-between items-center mb-3">
+//                   <h4 className="text-sm font-semibold text-white">AI Suggestions</h4>
+//                   <button
+//                     onClick={() => setShowAiSuggestions(false)}
+//                     className="text-gray-400 hover:text-white"
+//                   >
+//                     <X className="h-4 w-4" />
+//                   </button>
+//                 </div>
+//                 <div className="space-y-3">
+//                   {aiSuggestions.map((suggestion, index) => (
+//                     <div key={index} className="bg-gray-700 p-3 rounded-lg">
+//                       <div className="flex justify-between items-start mb-2">
+//                         <span className="text-sm font-medium text-blue-400">
+//                           {suggestion.title || `Suggestion ${index + 1}`}
+//                         </span>
+//                         <button
+//                           onClick={() => applyAiSuggestion(suggestion)}
+//                           className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-all"
+//                         >
+//                           Apply
+//                         </button>
+//                       </div>
+//                       {suggestion.description && (
+//                         <p className="text-xs text-gray-300 mb-2">{suggestion.description}</p>
+//                       )}
+//                       <pre className="bg-gray-800 p-2 rounded text-xs text-gray-200 overflow-x-auto">
+//                         <code>{suggestion.code}</code>
+//                       </pre>
+//                     </div>
+//                   ))}
+//                 </div>
+//               </div>
+//             )}
+            
+//             <div className="flex-1 min-h-[400px] rounded-xl overflow-hidden border border-gray-700">
+//               <div ref={editorRef} className="w-full h-full" />
+//             </div>
+            
+//             {/* Quick AI Actions Bar */}
+//             <div className="mt-2 flex justify-between items-center text-xs text-gray-500">
+//               <div className="flex space-x-4">
+               
+//                 {selectedText && <span>Selection: {selectedText.length} chars</span>}
+//               </div>
+//               <div className="flex items-center space-x-2">
+//                 {isLoadingAi && <span>AI processing...</span>}
+//                 <span>Lines: {activeFile?.content.split('\n').length || 0}</span>
+//               </div>
+//             </div>
+//           </div>
+
+         
+//         </div>
+
+//         {/* AI Chat Assistant */}
+//         <ChatAssistant />
+//       </div>
+//     </div>
+
+//     {/* Sidebar Chat */}
+//     {isChatOpen && (
+//       <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-lg border-l z-50 flex flex-col">
+//         {/* Header */}
+//         <div className="flex justify-between items-center p-3 border-b bg-purple-600 text-white">
+//           <h2 className="font-semibold">Project Chat</h2>
+//           <button onClick={() => setIsChatOpen(false)}>
+//             <X size={20} />
+//           </button>
+//         </div>
+//         {/* Chat Component */}
+//         <Chat user={authUser} projectId={projectId} />
+//       </div>
+//     )}
+//   </div>
+// );
+return (
+  <div className="min-h-screen bg-[#1a1c22] text-gray-300 p-6 md:p-12 font-sans flex flex-col">
+    {/* Header */}
+    <header className="flex flex-col md:flex-row justify-between items-center pb-6 md:pb-10 border-b border-gray-700 mb-6">
+      <h1 className="text-4xl font-extrabold text-white mb-4 md:mb-0">
+        <span className="text-cyan-400">Project:</span> {project.title}
+      </h1>
+      <div className="flex items-center space-x-4">
+        {/* Status indicator */}
         <div className="flex items-center space-x-4">
-          <span className={`text-sm px-3 py-1 rounded-full ${
-            status.includes('Saved') || status.includes('loaded') ? 'bg-green-900 text-green-200' :
-            status.includes('Created') ? 'bg-blue-900 text-blue-200' :
-            status.includes('deleted') ? 'bg-red-900 text-red-200' :
-            status.includes('Error') || status.includes('failed') ? 'bg-red-900 text-red-200' :
-            'text-gray-400'
-          }`}>
-            {status || 'Ready'}
-          </span>
-          <button
-            onClick={handleSave} 
-            disabled={isSaving || !project.id}
-            className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-              isSaving || !project.id
-                ? 'bg-gray-600 cursor-not-allowed' 
-                : 'bg-green-600 hover:bg-green-700 hover:shadow-lg transform hover:scale-105'
-            }`}
-          >
-            + New File
-          </button>
+        <button
+          onClick={() => setIsChatOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700"
+        >
+          <MessageSquare size={18} /> Chat
+        </button>
+        <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
+          status.includes('Saved') || status.includes('loaded')
+            ? 'bg-green-600 text-green-100'
+            : status.includes('Created')
+            ? 'bg-blue-600 text-blue-100'
+            : status.includes('deleted') || status.includes('Error') || status.includes('failed')
+            ? 'bg-red-600 text-red-100'
+            : 'bg-gray-700 text-gray-400'
+        }`}>
+          {status || 'Ready'}
+        </span>
+        {/* New File button */}
+        <button
+          onClick={handleSave}
+          disabled={isSaving || !project.id}
+          className={`px-5 py-2 rounded-xl font-semibold transition-all duration-200 ${
+            isSaving || !project.id
+              ? 'bg-gray-600 cursor-not-allowed text-gray-400'
+              : 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg'
+          }`}
+        >
+          Save Project
+        </button>
+      </div>
+      </div>
+    </header>
+
+    {/* Main Content Area */}
+    <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-8">
+      {/* File Explorer */}
+      <aside className="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 flex flex-col">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-semibold text-gray-100">File Explorer</h3>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setIsAddingFile(true)}
+              className="px-3 py-1 bg-sky-600 text-white rounded-lg text-sm hover:bg-sky-700 transition-colors"
+              title="Create New File"
+            >
+              + New
+            </button>
+            <label className="px-3 py-1 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors cursor-pointer flex items-center">
+              <Upload className="h-4 w-4 mr-1" />
+              Upload
+              <input
+                type="file"
+                multiple
+                onChange={handleFileUpload}
+                className="hidden"
+                disabled={isUploading || !project.id}
+              />
+            </label>
+            {selectedFiles.length > 0 && (
+              <button
+                onClick={handleDeleteMultipleFiles}
+                className="px-3 py-1 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors"
+                title={`Delete ${selectedFiles.length} selected file(s)`}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
+          </div>
         </div>
 
-      <div className="flex-1 flex flex-col lg:flex-row gap-6">
-        {/* File Explorer */}
-        <div className="lg:w-1/4 bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-700">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-50">Files</h3>
+        {/* File selection controls */}
+        {project.files.length > 1 && (
+          <div className="flex justify-between items-center mb-4 text-xs text-gray-400">
+            <span>{selectedFiles.length} selected</span>
+            <div className="space-x-2">
+              <button
+                onClick={() => setSelectedFiles(project.files.map(f => f.id))}
+                className="hover:text-cyan-400"
+              >
+                Select All
+              </button>
+              <button
+                onClick={() => setSelectedFiles([])}
+                className="hover:text-cyan-400"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Add File Form */}
+        {isAddingFile && (
+          <div className="flex flex-col space-y-3 mb-6 p-4 bg-gray-700 rounded-lg shadow-inner">
+            <input
+              type="text"
+              placeholder="Enter file name"
+              value={newFileName}
+              onChange={(e) => setNewFileName(e.target.value)}
+              className="w-full p-2 bg-gray-600 text-gray-200 rounded-lg border border-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              onKeyPress={(e) => e.key === 'Enter' && handleCreateFile()}
+            />
+            <select
+              value={newFileExtension}
+              onChange={(e) => setNewFileExtension(e.target.value)}
+              className="w-full p-2 bg-gray-600 text-gray-200 rounded-lg border border-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500"
+            >
+              {['html', 'css', 'js', 'ts', 'jsx', 'py', 'php', 'java', 'cpp', 'md', 'json', 'txt'].map(ext => (
+                <option key={ext} value={ext}>.{ext}</option>
+              ))}
+            </select>
             <div className="flex space-x-2">
               <button
-                onClick={() => setIsAddingFile(true)}
-                className="px-2 py-1 bg-sky-600 text-white rounded-lg text-sm hover:bg-sky-700 transition-all"
-                title="Create New File"
+                onClick={handleCreateFile}
+                className="flex-1 p-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors"
               >
-                + New
+                Create
               </button>
-              
-              <label className="px-2 py-1 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-all cursor-pointer">
-                <Upload className="h-4 w-4 inline mr-1" />
-                Upload
+              <button
+                onClick={() => {
+                  setIsAddingFile(false);
+                  setNewFileName('');
+                }}
+                className="flex-1 p-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* File List */}
+        <ul className="space-y-2 overflow-y-auto custom-scrollbar flex-1">
+          {project.files.map(file => (
+            <li
+              key={file.id}
+              className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${
+                file.id === activeFileId
+                  ? 'bg-cyan-600 text-white shadow-lg'
+                  : selectedFiles.includes(file.id)
+                  ? 'bg-gray-700 ring-2 ring-cyan-500'
+                  : 'hover:bg-gray-700'
+              }`}
+            >
+              <div className="flex items-center mr-2">
                 <input
-                  type="file"
-                  multiple
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  disabled={isUploading || !project.id}
+                  type="checkbox"
+                  checked={selectedFiles.includes(file.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedFiles([...selectedFiles, file.id]);
+                    } else {
+                      setSelectedFiles(selectedFiles.filter(id => id !== file.id));
+                    }
+                  }}
+                  className="rounded text-cyan-500 bg-gray-800 border-gray-600 focus:ring-cyan-500"
+                  onClick={(e) => e.stopPropagation()}
                 />
-              </label>
-              
-              {selectedFiles.length > 0 && (
+              </div>
+              <div
+                className="flex items-center space-x-2 flex-1 min-w-0"
+                onClick={() => handleFileSwitch(file.id)}
+              >
+                <FileTextIcon className="text-gray-400" />
+                <span className="truncate">{file.name}</span>
+              </div>
+              {project.files.length > 1 && (
                 <button
-                  onClick={handleDeleteMultipleFiles}
-                  className="px-2 py-1 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-all"
-                  title={`Delete ${selectedFiles.length} selected file(s)`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteFile(file.id);
+                  }}
+                  className="ml-2 text-red-400 hover:text-red-300 transition-colors"
+                  title="Delete file"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
               )}
+            </li>
+          ))}
+        </ul>
+      </aside>
+
+      {/* Editor & Chat Assistant */}
+      <div className="lg:col-span-3 flex flex-col gap-8">
+        {/* Code Editor */}
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-100">
+              Code Editor: <span className="text-cyan-400">{activeFile?.name}</span>
+            </h2>
+            <div className="flex items-center space-x-4 text-sm text-gray-400">
+              <span>Language: {getLanguageFromExtension(activeFile?.name || '')}</span>
             </div>
           </div>
-
-          {/* File selection controls */}
-          {project.files.length > 1 && (
-            <div className="flex justify-between items-center mb-3 text-sm text-gray-400">
-              <span>{selectedFiles.length} selected</span>
-              <div className="space-x-2">
+          
+          {/* AI Suggestions Panel */}
+          {showAiSuggestions && aiSuggestions.length > 0 && (
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 mb-4 max-h-64 overflow-y-auto custom-scrollbar">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-base font-semibold text-white">AI Suggestions ✨</h4>
                 <button
-                  onClick={() => setSelectedFiles(project.files.map(f => f.id))}
-                  className="hover:text-sky-400"
+                  onClick={() => setShowAiSuggestions(false)}
+                  className="text-gray-400 hover:text-white"
                 >
-                  Select All
-                </button>
-                <button
-                  onClick={() => setSelectedFiles([])}
-                  className="hover:text-sky-400"
-                >
-                  Clear
+                  <X className="h-5 w-5" />
                 </button>
               </div>
-            </div>
-          )}
-
-          {/* Add File Form */}
-          {isAddingFile && (
-            <div className="flex flex-col space-y-3 mb-4 p-3 bg-gray-700 rounded-lg">
-              <input
-                type="text"
-                placeholder="Enter file name"
-                value={newFileName}
-                onChange={(e) => setNewFileName(e.target.value)}
-                className="w-full p-2 bg-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-                onKeyPress={(e) => e.key === 'Enter' && handleCreateFile()}
-              />
-              <select
-                value={newFileExtension}
-                onChange={(e) => setNewFileExtension(e.target.value)}
-                className="w-full p-2 bg-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
-              >
-                <option value="html">.html</option>
-                <option value="css">.css</option>
-                <option value="js">.js</option>
-                <option value="ts">.ts</option>
-                <option value="jsx">.jsx</option>
-                <option value="py">.py</option>
-                <option value="php">.php</option>
-                <option value="java">.java</option>
-                <option value="cpp">.cpp</option>
-                <option value="md">.md</option>
-                <option value="json">.json</option>
-                <option value="txt">.txt</option>
-              </select>
-              <div className="flex space-x-2">
-                <button
-                  onClick={handleCreateFile}
-                  className="flex-1 p-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-all"
-                >
-                  Create
-                </button>
-                <button
-                  onClick={() => {
-                    setIsAddingFile(false);
-                    setNewFileName('');
-                  }}
-                  className="flex-1 p-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-all"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
-
-           {/* File List */}
-    <ul className="space-y-2">
-      {project.files.map(file => (
-        <li
-          key={file.id}
-          className={`flex items-center p-3 rounded-lg cursor-pointer transition-all ${
-            file.id === activeFileId
-              ? 'bg-sky-600 text-white shadow-lg'
-              : selectedFiles.includes(file.id)
-              ? 'bg-gray-700 ring-2 ring-sky-500'
-              : 'hover:bg-gray-700'
-          }`}
-        >
-          {/* File selection checkbox */}
-          <div className="flex items-center mr-2">
-            <input
-              type="checkbox"
-              checked={selectedFiles.includes(file.id)}
-              onChange={(e) => {
-                if (e.target.checked) {
-                  setSelectedFiles([...selectedFiles, file.id]);
-                } else {
-                  setSelectedFiles(selectedFiles.filter(id => id !== file.id));
-                }
-              }}
-              className="rounded"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-
-          <div
-            className="flex items-center space-x-2 flex-1"
-            onClick={() => handleFileSwitch(file.id)}
-          >
-            <FileTextIcon />
-            <span className="truncate">{file.name}</span>
-          </div>
-
-          {project.files.length > 1 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowDeleteConfirm(file.id);
-                // deleteFile(file.id);
-                handleDeleteFile(file.id);
-              }}
-              className="ml-2 text-red-400 hover:text-red-300 transition-colors"
-              title="Delete file"
-            >
-              ✕
-            </button>
-          )}
-        </li>
-      ))}
-    </ul>
-    {/* Remove the malformed tag here */}
-</div>
-        {/* Editor */}
-        <div className="flex-1 flex flex-col gap-6">
-          {/* Code Editor */}
-          <div className="flex-1 flex flex-col min-h-0">
-            <div className="flex justify-between items-center mb-3">
-              <label className="text-lg font-semibold text-gray-50">
-                Code Editor: {activeFile?.name}
-              </label>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-400">
-                  Language: {getLanguageFromExtension(activeFile?.name || '')}
-                </span>
-                
-                {/* AI Toolbar */}
-                {/* <div className="flex space-x-1">
-                  <button
-                    onClick={handleAiCompletion}
-                    disabled={isLoadingAi}
-                    className="px-3 py-1 bg-purple-600 text-white rounded text-xs hover:bg-purple-700 disabled:opacity-50 transition-all"
-                    title="AI Completion (Ctrl+Space)"
-                  >
-                    {isLoadingAi ? '...' : '🤖 Complete'}
-                  </button>
-                  <button
-                    onClick={handleAiImprove}
-                    disabled={isLoadingAi}
-                    className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 disabled:opacity-50 transition-all"
-                    title="AI Improve (Ctrl+Shift+I)"
-                  >
-                    ✨ Improve
-                  </button>
-                </div> */}
-              </div>
-            </div>
-            
-            {/* AI Suggestions Panel */}
-            {showAiSuggestions && aiSuggestions.length > 0 && (
-              <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-3 max-h-64 overflow-y-auto">
-                <div className="flex justify-between items-center mb-3">
-                  <h4 className="text-sm font-semibold text-white">AI Suggestions</h4>
-                  <button
-                    onClick={() => setShowAiSuggestions(false)}
-                    className="text-gray-400 hover:text-white"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  {aiSuggestions.map((suggestion, index) => (
-                    <div key={index} className="bg-gray-700 p-3 rounded-lg">
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-sm font-medium text-blue-400">
-                          {suggestion.title || `Suggestion ${index + 1}`}
-                        </span>
-                        <button
-                          onClick={() => applyAiSuggestion(suggestion)}
-                          className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-all"
-                        >
-                          Apply
-                        </button>
-                      </div>
-                      {suggestion.description && (
-                        <p className="text-xs text-gray-300 mb-2">{suggestion.description}</p>
-                      )}
-                      <pre className="bg-gray-800 p-2 rounded text-xs text-gray-200 overflow-x-auto">
-                        <code>{suggestion.code}</code>
-                      </pre>
+              <div className="space-y-4">
+                {aiSuggestions.map((suggestion, index) => (
+                  <div key={index} className="bg-gray-700 p-4 rounded-lg">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-sm font-medium text-blue-400">
+                        {suggestion.title || `Suggestion ${index + 1}`}
+                      </span>
+                      <button
+                        onClick={() => applyAiSuggestion(suggestion)}
+                        className="px-3 py-1 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700 transition-colors"
+                      >
+                        Apply
+                      </button>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            <div className="flex-1 min-h-[400px] rounded-xl overflow-hidden border border-gray-700">
-              <div ref={editorRef} className="w-full h-full" />
-            </div>
-            
-            {/* Quick AI Actions Bar */}
-            <div className="mt-2 flex justify-between items-center text-xs text-gray-500">
-              <div className="flex space-x-4">
-               
-                {selectedText && <span>Selection: {selectedText.length} chars</span>}
-              </div>
-              <div className="flex items-center space-x-2">
-                {isLoadingAi && <span>AI processing...</span>}
-                <span>Lines: {activeFile?.content.split('\n').length || 0}</span>
+                    {suggestion.description && (
+                      <p className="text-xs text-gray-300 mb-2">{suggestion.description}</p>
+                    )}
+                    <pre className="bg-gray-900 p-2 rounded text-xs text-gray-200 overflow-x-auto border border-gray-700">
+                      <code>{suggestion.code}</code>
+                    </pre>
+                  </div>
+                ))}
               </div>
             </div>
+          )}
+
+          <div className="flex-1 min-h-[50vh] rounded-2xl overflow-hidden border border-gray-700 shadow-2xl">
+            <div ref={editorRef} className="w-full h-full" />
           </div>
 
-         
+          <div className="mt-4 flex justify-between items-center text-xs text-gray-500">
+            <div className="flex space-x-4">
+              {selectedText && <span>Selection: {selectedText.length} chars</span>}
+            </div>
+            <div className="flex items-center space-x-2">
+              {isLoadingAi && <span className="text-cyan-400 animate-pulse">AI processing...</span>}
+              <span>Lines: {activeFile?.content.split('\n').length || 0}</span>
+            </div>
+          </div>
         </div>
 
         {/* AI Chat Assistant */}
@@ -1226,19 +1461,21 @@ const scrollToTop = () => {
 
     {/* Sidebar Chat */}
     {isChatOpen && (
-      <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-lg border-l z-50 flex flex-col">
-        {/* Header */}
-        <div className="flex justify-between items-center p-3 border-b bg-purple-600 text-white">
-          <h2 className="font-semibold">Project Chat</h2>
-          <button onClick={() => setIsChatOpen(false)}>
-            <X size={20} />
+      <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-gray-800 shadow-2xl border-l border-gray-700 z-50 flex flex-col transition-transform duration-300 ease-in-out">
+        <div className="flex justify-between items-center p-4 border-b border-gray-700 bg-gray-900">
+          <h2 className="font-semibold text-lg text-white">AI Chat Assistant 🤖</h2>
+          <button onClick={() => setIsChatOpen(false)} className="text-gray-400 hover:text-white">
+            <X size={24} />
           </button>
         </div>
-        {/* Chat Component */}
         <Chat user={authUser} projectId={projectId} />
       </div>
     )}
   </div>
+  
+  
 );
+
+
 }
 export default CodeEditor;

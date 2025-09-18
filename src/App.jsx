@@ -58,25 +58,22 @@ function App() {
             <Route path="/reset-password" element={<GuestRoute><ResetPasswordPage /></GuestRoute>} />
             <Route path="/otp" element={<GuestRoute><VerifyOtpPage /></GuestRoute>} />
 
-          </Routes>
-    
-      {/* Admin Routes */}
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute role="admin">
-            <AdminLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<AdminDashboard />} />
-        <Route path="users" element={<AdminUsersPage />} />
-        <Route path="projects" element={<AdminProjectsPage />} />
-      </Route>
+            {/* Admin Routes */}
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute role="admin">
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsersPage />} />
+              <Route path="projects" element={<AdminProjectsPage />} />
+            </Route>
             {/* Not Authorized Page */}
             <Route path="/not-authorized" element={<NotAuthorized />} />
-
-        </Routes>
+          </Routes>
         </main>
       </div>
       <Toaster position="top-right" toastOptions={{ duration: 4000 }} />

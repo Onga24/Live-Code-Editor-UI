@@ -130,12 +130,12 @@ const Navbar = () => {
               <FolderKanban className="w-4 h-4" /> Projects
             </Link>
 
-            <Link
+            {/* <Link
               to="/settings"
               className="flex items-center gap-1 text-gray-700 hover:text-primary transition"
             >
               <Settings className="w-4 h-4" /> Settings
-            </Link>
+            </Link> */}
 
             <button
               onClick={handleLogout}

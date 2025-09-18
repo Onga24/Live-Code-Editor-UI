@@ -29,6 +29,18 @@ const ProjectsPage = () => {
       setLoading(false);
     }
   };
+  const loadProject = async (projectId) => {
+  try {
+    const response = await apiRequest(`/projects/${projectId}`, 'GET');
+    if (response.status === 200) {
+      setProject(response.project);
+    } else {
+      console.error('Failed to load project:', response.message);
+    }
+  } catch (error) {
+    console.error('Error loading project:', error);
+  }
+};
 
   useEffect(() => {
     fetchProjects();
@@ -165,20 +177,32 @@ const ProjectsPage = () => {
                 </div>
 
                 {/* Members Avatars */}
-                <div className="flex items-center mt-4">
-                  <h3 className="text-sm font-semibold mr-2">Members:</h3>
-                  <div className="flex -space-x-2 overflow-hidden">
-                    {p.members &&
-                      p.members.map((member) => (
+              {/* <div className="flex items-center mt-4">
+    <h3 className="text-sm font-semibold mr-2">Members:</h3>
+    <div className="flex -space-x-2 overflow-hidden">
+        {Array.isArray(p.all_users) &&
+            [...p.all_users]
+                .sort((a, b) => (a.pivot.role === 'owner' ? -1 : 1))
+                .map((member) => (
+                    <div key={member.id} className="relative">
                         <img
-                          key={member.id}
-                          className="inline-block h-8 w-8 rounded-full ring-2 ring-white"
-                          src={member.profile_picture_url || "/default-avatar.png"}
-                          title={member.name}
+                            className="inline-block h-8 w-8 rounded-full ring-2 ring-white"
+                            src={member.profile_picture }
+                            title={member.name}
                         />
-                      ))}
-                  </div>
-                </div>
+                        {member.pivot.role === 'owner' && (
+                            <span
+                                className="absolute bottom-0 right-0 transform translate-x-1/2 translate-y-1/2 
+                                        rounded-full bg-blue-500 text-white text-xs font-bold px-1.5 py-0.5"
+                                title="Project Owner"
+                            >
+                                👑
+                            </span>
+                        )}
+                    </div>
+                ))}
+    </div>
+</div> */}
 
                 {/* Actions */}
                 <div className="flex gap-2 mt-4">
