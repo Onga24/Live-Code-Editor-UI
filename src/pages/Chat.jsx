@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axiosInstance from '../lib/axios';
-import '../lib/echo'; 
+import '../lib/echo';
 
 const Chat = ({ user, projectId = null, chatRoom = 'general' }) => {
     const [messages, setMessages] = useState([]);
@@ -78,7 +78,7 @@ const Chat = ({ user, projectId = null, chatRoom = 'general' }) => {
         if (projectId) {
             // قناة خاصة بالمشروع
             console.log(`Subscribing to private channel: project.${projectId}`);
-            
+
             channel = window.Echo.private(`project.${projectId}`)
                 .listen('.MessageSent', (e) => {
                     console.log("(: Received broadcast:", e);
@@ -101,7 +101,7 @@ const Chat = ({ user, projectId = null, chatRoom = 'general' }) => {
         } else {
             // قناة عامة
             console.log(`Joining presence channel: chat.${chatRoom}`);
-            
+
             channel = window.Echo.join(`chat.${chatRoom}`)
                 .listen('MessageSent', (e) => {
                     console.log('Received message via broadcast:', e);
@@ -144,8 +144,8 @@ const Chat = ({ user, projectId = null, chatRoom = 'general' }) => {
 
     return (
         <div className="chat-container" style={{ height: '500px', display: 'flex', flexDirection: 'column' }}>
-            <div className="chat-header" style={{ 
-                padding: '10px', 
+            <div className="chat-header" style={{
+                padding: '10px',
                 borderBottom: '1px solid #ccc',
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -155,11 +155,11 @@ const Chat = ({ user, projectId = null, chatRoom = 'general' }) => {
                     {projectId ? `Project Chat: ${projectId}` : `Chat Room: ${chatRoom}`}
                 </h3>
                 <div>
-                    <span className={`status ${isConnected ? 'connected' : 'disconnected'}`} 
-                          style={{ 
-                              color: isConnected ? 'green' : 'red',
-                              fontSize: '12px'
-                          }}>
+                    <span className={`status ${isConnected ? 'connected' : 'disconnected'}`}
+                        style={{
+                            color: isConnected ? 'green' : 'red',
+                            fontSize: '12px'
+                        }}>
                         {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
                     </span>
                     {connectionError && (
@@ -170,9 +170,9 @@ const Chat = ({ user, projectId = null, chatRoom = 'general' }) => {
                 </div>
             </div>
 
-            <div className="messages-container" style={{ 
-                flex: 1, 
-                overflowY: 'auto', 
+            <div className="messages-container" style={{
+                flex: 1,
+                overflowY: 'auto',
                 padding: '10px',
                 backgroundColor: '#f9f9f9'
             }}>
@@ -183,35 +183,69 @@ const Chat = ({ user, projectId = null, chatRoom = 'general' }) => {
                         <div
                             key={message.id}
                             style={{
-                                marginBottom: '15px',
-                                padding: '10px',
-                                borderRadius: '8px',
-                                backgroundColor: message.user.id === user.id ? '#007bff' : '#fff',
-                                color: message.user.id === user.id ? 'white' : 'black',
-                                marginLeft: message.user.id === user.id ? '50px' : '0',
-                                marginRight: message.user.id === user.id ? '0' : '50px',
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                display: 'flex',
+                                justifyContent: message.user.id === user.id ? 'flex-end' : 'flex-start',
+                                marginBottom: '10px',
                             }}
                         >
-                            <div style={{ 
-                                display: 'flex', 
-                                justifyContent: 'space-between', 
-                                marginBottom: '5px',
-                                fontSize: '12px',
-                                opacity: '0.8'
-                            }}>
-                                <span>{message.user.name}</span>
-                                <span>{formatTime(message.created_at)}</span>
+                            <div
+                                style={{
+                                    maxWidth: '70%',
+                                    padding: '10px',
+                                    borderRadius: message.user.id === user.id
+                                        ? '16px 16px 0px 16px'   // شكل فقاعة لليمين
+                                        : '16px 16px 16px 0px', // شكل فقاعة للشمال
+                                    backgroundColor: message.user.id === user.id ? '#007bff' : '#e5e5ea',
+                                    color: message.user.id === user.id ? 'white' : 'black',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                }}
+                            >
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    marginBottom: '5px',
+                                    fontSize: '12px',
+                                    opacity: '0.8'
+                                }}>
+                                    <span>{message.user.name}</span>
+                                    <span>{formatTime(message.created_at)}</span>
+                                </div>
+                                <div>{message.content}</div>
                             </div>
-                            <div>{message.content}</div>
                         </div>
+
+                        // <div
+                        //     key={message.id}
+                        //     style={{
+                        //         marginBottom: '15px',
+                        //         padding: '10px',
+                        //         borderRadius: '8px',
+                        //         backgroundColor: message.user.id === user.id ? '#007bff' : '#fff',
+                        //         color: message.user.id === user.id ? 'white' : 'black',
+                        //         marginLeft: message.user.id === user.id ? '50px' : '0',
+                        //         marginRight: message.user.id === user.id ? '0' : '50px',
+                        //         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        //     }}
+                        // >
+                        //     <div style={{ 
+                        //         display: 'flex', 
+                        //         justifyContent: 'space-between', 
+                        //         marginBottom: '5px',
+                        //         fontSize: '12px',
+                        //         opacity: '0.8'
+                        //     }}>
+                        //         <span>{message.user.name}</span>
+                        //         <span>{formatTime(message.created_at)}</span>
+                        //     </div>
+                        //     <div>{message.content}</div>
+                        // </div>
                     ))
                 )}
                 <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={sendMessage} style={{ 
-                padding: '10px', 
+            <form onSubmit={sendMessage} style={{
+                padding: '10px',
                 borderTop: '1px solid #ccc',
                 display: 'flex',
                 gap: '10px'
@@ -229,8 +263,8 @@ const Chat = ({ user, projectId = null, chatRoom = 'general' }) => {
                         borderRadius: '4px'
                     }}
                 />
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     disabled={!newMessage.trim()}
                     style={{
                         padding: '10px 20px',
