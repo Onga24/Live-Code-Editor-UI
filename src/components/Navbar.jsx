@@ -88,7 +88,7 @@ const Navbar = () => {
     try {
       await logout();
       toast.success("Logout successful ✅");
-      navigate("/login");
+      navigate("/");
     } catch (err) {
       toast.error("Logout failed ❌");
       console.error("Logout failed:", err);
@@ -106,10 +106,9 @@ const Navbar = () => {
         {/* Links */}
         {authUser ? (
           <div className="flex items-center gap-4">
-            {/* ✅ لو أدمن يظهر Dashboard + Profile */}
             {authUser.role === "admin" && (
               <Link
-                to="/admin/dashboard"
+                to="/admin"
                 className="flex items-center gap-1 text-gray-700 hover:text-primary transition"
               >
                 <LayoutDashboard className="w-4 h-4" /> Dashboard

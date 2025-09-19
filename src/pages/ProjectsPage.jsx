@@ -1,9 +1,12 @@
 import { useState, useEffect, useContext } from "react"
 import { AuthContext } from "../context/AuthContext"
 import { PlusCircle, Users, LogIn } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ProjectsPage = () => {
     const { authUser, apiRequest } = useContext(AuthContext);
+    const navigate = useNavigate();
+
     const [ projects, setProjects ] = useState([]);
     const [ loading, setLoading ] = useState(false);
     const [ showCreateForm, setShowCreateForm ] = useState(false);
@@ -55,81 +58,86 @@ const ProjectsPage = () => {
             setErrors(res.errors || {});
         }
     };
+
     return (
         <div className="min-h-screen pt-20">
-        <div className="max-w-4xl mx-auto p-4">
-            <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">My Projects</h1>
-            <div className="flex gap-2">
-                <button
-                onClick={() => setShowCreateForm(!showCreateForm)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
-                <PlusCircle size={18} /> Create
-                </button>
-                <button
-                onClick={() => setShowJoinForm(!showJoinForm)}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-                >
-                <LogIn size={18} /> Join
-                </button>
-            </div>
-            </div>
-
-            {/* Create project form */}
-            {showCreateForm && (
-            <form onSubmit={handleCreate} className="mb-6 p-4 bg-base-300 rounded-lg space-y-3">
-                <label className="block text-sm">Project Name</label>
-                <input
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border bg-base-200"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                />
-                {errors.name && <p className="text-red-500 text-sm">{errors.name[0]}</p>}
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg">
-                Create
-                </button>
-            </form>
-            )}
-
-            {/* Join project form */}
-            {showJoinForm && (
-            <form onSubmit={handleJoin} className="mb-6 p-4 bg-base-300 rounded-lg space-y-3">
-                <label className="block text-sm">Invite Code</label>
-                <input
-                type="text"
-                className="w-full px-3 py-2 rounded-lg border bg-base-200"
-                value={inviteCode}
-                onChange={(e) => setInviteCode(e.target.value)}
-                />
-                {errors.invite_code && <p className="text-red-500 text-sm">{errors.invite_code[0]}</p>}
-                <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-lg">
-                Join
-                </button>
-            </form>
-            )}
-
-            {/* project list */}
-            {loading ? (
-            <p>Loading...</p>
-            ) : projects.length === 0 ? (
-            <p className="text-zinc-500">You don't have any projects yet.</p>
-            ) : (
-            <div className="grid md:grid-cols-2 gap-4">
-                {projects.map((p) => (
-                <div key={p.id} className="bg-base-300 p-4 rounded-lg shadow">
-                    <h2 className="text-lg font-semibold">{p.name}</h2>
-                    <p className="text-sm text-zinc-400">Invite: {p.invite_code}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                    <Users size={18} className="text-zinc-500" />
-                    <span className="text-sm">{p.members?.length || 1} Members</span>
+            <div className="max-w-4xl mx-auto p-4">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold">My Projects</h1>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setShowCreateForm(!showCreateForm)}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                        >
+                            <PlusCircle size={18} /> Create
+                        </button>
+                        <button
+                            onClick={() => setShowJoinForm(!showJoinForm)}
+                            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                        >
+                            <LogIn size={18} /> Join
+                        </button>
                     </div>
                 </div>
-                ))}
+
+                {/* Create project form */}
+                {showCreateForm && (
+                    <form onSubmit={handleCreate} className="mb-6 p-4 bg-base-300 rounded-lg space-y-3">
+                        <label className="block text-sm">Project Name</label>
+                        <input
+                            type="text"
+                            className="w-full px-3 py-2 rounded-lg border bg-base-200"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                        {errors.name && <p className="text-red-500 text-sm">{errors.name[0]}</p>}
+                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                            Create
+                        </button>
+                    </form>
+                )}
+
+                {/* Join project form */}
+                {showJoinForm && (
+                    <form onSubmit={handleJoin} className="mb-6 p-4 bg-base-300 rounded-lg space-y-3">
+                        <label className="block text-sm">Invite Code</label>
+                        <input
+                            type="text"
+                            className="w-full px-3 py-2 rounded-lg border bg-base-200"
+                            value={inviteCode}
+                            onChange={(e) => setInviteCode(e.target.value)}
+                        />
+                        {errors.invite_code && <p className="text-red-500 text-sm">{errors.invite_code[0]}</p>}
+                        <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-lg">
+                            Join
+                        </button>
+                    </form>
+                )}
+
+                {/* project list */}
+                {loading ? (
+                    <p>Loading...</p>
+                ) : projects.length === 0 ? (
+                    <p className="text-zinc-500">You don't have any projects yet.</p>
+                ) : (
+                    <div className="grid md:grid-cols-2 gap-4">
+                        {projects.map((p) => (
+                            <div
+                                key={p.id}
+                                className="bg-base-300 p-4 rounded-lg shadow cursor-pointer hover:bg-base-200 transition"
+                                onClick={() => navigate(`/projects/${p.id}`)} 
+                            >
+                                <h2 className="text-lg font-semibold">{p.name}</h2>
+                                <p className="text-sm text-zinc-400">Invite: {p.invite_code}</p>
+                                <div className="flex items-center gap-2 mt-2">
+                                    <Users size={18} className="text-zinc-500" />
+                                    <span className="text-sm">{p.members?.length || 1} Members</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
-            )}
-        </div>
         </div>
     );
 };

@@ -20,6 +20,8 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminUsersPage from './pages/Admin/AdminUsersPage'
 import AdminProjectsPage from './pages/Admin/AdminProjectsPage'
 import AdminLayout from './pages/Admin/AdminLayout';
+import ProjectEditorPage from './pages/ProjectEditorPage'
+
 
 
 function App() {
@@ -32,7 +34,7 @@ function App() {
       <main className="pt-15">
 
         <Routes>
-          <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+          <Route path="/" element={<GuestRoute><HomePage /></GuestRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
@@ -59,6 +61,9 @@ function App() {
       </Route>
             {/* Not Authorized Page */}
             <Route path="/not-authorized" element={<NotAuthorized />} />
+
+            <Route path="/projects/:id" element={<ProtectedRoute><ProjectEditorPage /></ProtectedRoute>} />
+
 
         </Routes>
         </main>
