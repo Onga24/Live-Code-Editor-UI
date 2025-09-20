@@ -24,7 +24,7 @@ import AdminLayout from './pages/Admin/AdminLayout';
 import CodeEditor from './pages/CodeEditor';
 import Chat from './pages/Chat'
 
-
+import { FileUtilsProvider } from "./context/fileContext";
 
 
 function App() {
@@ -36,44 +36,45 @@ function App() {
         <Navbar />
         <main className="min-h-screen bg-gray-900 text-gray-200 p-4 md:p-8 flex flex-col">
 
-          <Routes>
-            <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
-            <Route
-              path="/projects/:id/chat"
-              element={
-                <ProtectedRoute>
-                  <Chat user={authUser} />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-            <Route path="/code-editor" element={<ProtectedRoute><CodeEditor /></ProtectedRoute>} />
+            <FileUtilsProvider>
+              <Routes>
+                <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
+                <Route
+                  path="/projects/:id/chat"
+                  element={
+                    <ProtectedRoute>
+                      <Chat user={authUser} />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+                  <Route path="/code-editor" element={<ProtectedRoute><CodeEditor /></ProtectedRoute>} />
+                <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+                <Route path="/signup" element={<GuestRoute><SignUpPage /></GuestRoute>} />
 
-            <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
-            <Route path="/signup" element={<GuestRoute><SignUpPage /></GuestRoute>} />
+                <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
+                <Route path="/reset-password" element={<GuestRoute><ResetPasswordPage /></GuestRoute>} />
+                <Route path="/otp" element={<GuestRoute><VerifyOtpPage /></GuestRoute>} />
 
-            <Route path="/forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
-            <Route path="/reset-password" element={<GuestRoute><ResetPasswordPage /></GuestRoute>} />
-            <Route path="/otp" element={<GuestRoute><VerifyOtpPage /></GuestRoute>} />
-
-            {/* Admin Routes */}
-            <Route
-              path="/admin/dashboard"
-              element={
-                <ProtectedRoute role="admin">
-                  <AdminLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<AdminDashboard />} />
-              <Route path="users" element={<AdminUsersPage />} />
-              <Route path="projects" element={<AdminProjectsPage />} />
-            </Route>
-            {/* Not Authorized Page */}
-            <Route path="/not-authorized" element={<NotAuthorized />} />
-          </Routes>
+                {/* Admin Routes */}
+                <Route
+                  path="/admin/dashboard"
+                  element={
+                    <ProtectedRoute role="admin">
+                      <AdminLayout />
+                    </ProtectedRoute>
+                  }
+                  >
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="users" element={<AdminUsersPage />} />
+                  <Route path="projects" element={<AdminProjectsPage />} />
+                </Route>
+                {/* Not Authorized Page */}
+                <Route path="/not-authorized" element={<NotAuthorized />} />
+              </Routes>
+            </FileUtilsProvider>
         </main>
       </div>
       <Toaster position="top-right" toastOptions={{ duration: 4000 }} />

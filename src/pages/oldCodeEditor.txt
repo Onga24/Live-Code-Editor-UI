@@ -1,3 +1,318 @@
+  //   return (
+  //        <div className="min-h-screen bg-dark-gray text-gray-200 p-4 md:p-8 flex flex-col " style={{backgroundColor:'#101828'}}>
+  //       {/* Header */}
+  //       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+  //         <h1 className="text-3xl font-bold text-gray-50">
+  //           <span className="text-sky-400">Project:</span> {project.title}
+  //         </h1>
+  //         <div className="flex items-center space-x-4">
+  //           <span className={`text-sm px-3 py-1 rounded-full ${
+  //             status.includes('Saved') || status.includes('loaded') ? 'bg-green-900 text-green-200' :
+  //             status.includes('Created') ? 'bg-blue-900 text-blue-200' :
+  //             status.includes('deleted') ? 'bg-red-900 text-red-200' :
+  //             status.includes('Error') || status.includes('failed') ? 'bg-red-900 text-red-200' :
+  //             'text-gray-400'
+  //           }`}>
+  //             {status || 'Ready'}
+  //           </span>
+  //           <button
+  //             onClick={handleSave} 
+  //             disabled={isSaving || !project.id}
+  //             className={`px-6 py-2 rounded-lg font-semibold transition-all ${
+  //               isSaving || !project.id
+  //                 ? 'bg-gray-600 cursor-not-allowed' 
+  //                 : 'bg-green-600 hover:bg-green-700 hover:shadow-lg transform hover:scale-105'
+  //             }`}
+  //           >
+  //             + New File
+  //           </button>
+  //         </div>
+
+  //       <div className="flex-1 flex flex-col lg:flex-row gap-6">
+  //         {/* File Explorer */}
+  //         <div className="lg:w-1/4 bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-700">
+  //           <div className="flex justify-between items-center mb-4">
+  //             <h3 className="text-lg font-semibold text-gray-50">Files</h3>
+  //             <div className="flex space-x-2">
+  //               <button
+  //                 onClick={() => setIsAddingFile(true)}
+  //                 className="px-2 py-1 bg-sky-600 text-white rounded-lg text-sm hover:bg-sky-700 transition-all"
+  //                 title="Create New File"
+  //               >
+  //                 + New
+  //               </button>
+
+  //               <label className="px-2 py-1 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-all cursor-pointer">
+  //                 <Upload className="h-4 w-4 inline mr-1" />
+  //                 Upload
+  //                 <input
+  //                   type="file"
+  //                   multiple
+  //                   onChange={handleFileUpload}
+  //                   className="hidden"
+  //                   disabled={isUploading || !project.id}
+  //                 />
+  //               </label>
+
+  //               {selectedFiles.length > 0 && (
+  //                 <button
+  //                   onClick={handleDeleteMultipleFiles}
+  //                   className="px-2 py-1 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-all"
+  //                   title={`Delete ${selectedFiles.length} selected file(s)`}
+  //                 >
+  //                   <Trash2 className="h-4 w-4" />
+  //                 </button>
+  //               )}
+  //             </div>
+  //           </div>
+
+  //           {/* File selection controls */}
+  //           {project.files.length > 1 && (
+  //             <div className="flex justify-between items-center mb-3 text-sm text-gray-400">
+  //               <span>{selectedFiles.length} selected</span>
+  //               <div className="space-x-2">
+  //                 <button
+  //                   onClick={() => setSelectedFiles(project.files.map(f => f.id))}
+  //                   className="hover:text-sky-400"
+  //                 >
+  //                   Select All
+  //                 </button>
+  //                 <button
+  //                   onClick={() => setSelectedFiles([])}
+  //                   className="hover:text-sky-400"
+  //                 >
+  //                   Clear
+  //                 </button>
+  //               </div>
+  //             </div>
+  //           )}
+
+  //           {/* Add File Form */}
+  //           {isAddingFile && (
+  //             <div className="flex flex-col space-y-3 mb-4 p-3 bg-gray-700 rounded-lg">
+  //               <input
+  //                 type="text"
+  //                 placeholder="Enter file name"
+  //                 value={newFileName}
+  //                 onChange={(e) => setNewFileName(e.target.value)}
+  //                 className="w-full p-2 bg-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+  //                 onKeyPress={(e) => e.key === 'Enter' && handleCreateFile()}
+  //               />
+  //               <select
+  //                 value={newFileExtension}
+  //                 onChange={(e) => setNewFileExtension(e.target.value)}
+  //                 className="w-full p-2 bg-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+  //               >
+  //                 <option value="html">.html</option>
+  //                 <option value="css">.css</option>
+  //                 <option value="js">.js</option>
+  //                 <option value="ts">.ts</option>
+  //                 <option value="jsx">.jsx</option>
+  //                 <option value="py">.py</option>
+  //                 <option value="php">.php</option>
+  //                 <option value="java">.java</option>
+  //                 <option value="cpp">.cpp</option>
+  //                 <option value="md">.md</option>
+  //                 <option value="json">.json</option>
+  //                 <option value="txt">.txt</option>
+  //               </select>
+  //               <div className="flex space-x-2">
+  //                 <button
+  //                   onClick={handleCreateFile}
+  //                   className="flex-1 p-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-all"
+  //                 >
+  //                   Create
+  //                 </button>
+  //                 <button
+  //                   onClick={() => {
+  //                     setIsAddingFile(false);
+  //                     setNewFileName('');
+  //                   }}
+  //                   className="flex-1 p-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-all"
+  //                 >
+  //                   Cancel
+  //                 </button>
+  //               </div>
+  //             </div>
+  //           )}
+
+  //            {/* File List */}
+  //     <ul className="space-y-2">
+  //       {project.files.map(file => (
+  //         <li
+  //           key={file.id}
+  //           className={`flex items-center p-3 rounded-lg cursor-pointer transition-all ${
+  //             file.id === activeFileId
+  //               ? 'bg-sky-600 text-white shadow-lg'
+  //               : selectedFiles.includes(file.id)
+  //               ? 'bg-gray-700 ring-2 ring-sky-500'
+  //               : 'hover:bg-gray-700'
+  //           }`}
+  //         >
+  //           {/* File selection checkbox */}
+  //           <div className="flex items-center mr-2">
+  //             <input
+  //               type="checkbox"
+  //               checked={selectedFiles.includes(file.id)}
+  //               onChange={(e) => {
+  //                 if (e.target.checked) {
+  //                   setSelectedFiles([...selectedFiles, file.id]);
+  //                 } else {
+  //                   setSelectedFiles(selectedFiles.filter(id => id !== file.id));
+  //                 }
+  //               }}
+  //               className="rounded"
+  //               onClick={(e) => e.stopPropagation()}
+  //             />
+  //           </div>
+
+  //           <div
+  //             className="flex items-center space-x-2 flex-1"
+  //             onClick={() => handleFileSwitch(file.id)}
+  //           >
+  //             <FileTextIcon />
+  //             <span className="truncate">{file.name}</span>
+  //           </div>
+
+  //           {project.files.length > 1 && (
+  //             <button
+  //               onClick={(e) => {
+  //                 e.stopPropagation();
+  //                 setShowDeleteConfirm(file.id);
+  //                 // deleteFile(file.id);
+  //                 handleDeleteFile(file.id);
+  //               }}
+  //               className="ml-2 text-red-400 hover:text-red-300 transition-colors"
+  //               title="Delete file"
+  //             >
+  //               ✕
+  //             </button>
+  //           )}
+  //         </li>
+  //       ))}
+  //     </ul>
+  //     {/* Remove the malformed tag here */}
+  // </div>
+  //         {/* Editor */}
+  //         <div className="flex-1 flex flex-col gap-6">
+  //           {/* Code Editor */}
+  //           <div className="flex-1 flex flex-col min-h-0">
+  //             <div className="flex justify-between items-center mb-3">
+  //               <label className="text-lg font-semibold text-gray-50">
+  //                 Code Editor: {activeFile?.name}
+  //               </label>
+  //               <div className="flex items-center space-x-2">
+  //                 <span className="text-sm text-gray-400">
+  //                   Language: {getLanguageFromExtension(activeFile?.name || '')}
+  //                 </span>
+
+  //                 {/* AI Toolbar */}
+  //                 {/* <div className="flex space-x-1">
+  //                   <button
+  //                     onClick={handleAiCompletion}
+  //                     disabled={isLoadingAi}
+  //                     className="px-3 py-1 bg-purple-600 text-white rounded text-xs hover:bg-purple-700 disabled:opacity-50 transition-all"
+  //                     title="AI Completion (Ctrl+Space)"
+  //                   >
+  //                     {isLoadingAi ? '...' : '🤖 Complete'}
+  //                   </button>
+  //                   <button
+  //                     onClick={handleAiImprove}
+  //                     disabled={isLoadingAi}
+  //                     className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 disabled:opacity-50 transition-all"
+  //                     title="AI Improve (Ctrl+Shift+I)"
+  //                   >
+  //                     ✨ Improve
+  //                   </button>
+  //                 </div> */}
+  //               </div>
+  //             </div>
+
+  //             {/* AI Suggestions Panel */}
+  //             {showAiSuggestions && aiSuggestions.length > 0 && (
+  //               <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-3 max-h-64 overflow-y-auto">
+  //                 <div className="flex justify-between items-center mb-3">
+  //                   <h4 className="text-sm font-semibold text-white">AI Suggestions</h4>
+  //                   <button
+  //                     onClick={() => setShowAiSuggestions(false)}
+  //                     className="text-gray-400 hover:text-white"
+  //                   >
+  //                     <X className="h-4 w-4" />
+  //                   </button>
+  //                 </div>
+  //                 <div className="space-y-3">
+  //                   {aiSuggestions.map((suggestion, index) => (
+  //                     <div key={index} className="bg-gray-700 p-3 rounded-lg">
+  //                       <div className="flex justify-between items-start mb-2">
+  //                         <span className="text-sm font-medium text-blue-400">
+  //                           {suggestion.title || `Suggestion ${index + 1}`}
+  //                         </span>
+  //                         <button
+  //                           onClick={() => applyAiSuggestion(suggestion)}
+  //                           className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-all"
+  //                         >
+  //                           Apply
+  //                         </button>
+  //                       </div>
+  //                       {suggestion.description && (
+  //                         <p className="text-xs text-gray-300 mb-2">{suggestion.description}</p>
+  //                       )}
+  //                       <pre className="bg-gray-800 p-2 rounded text-xs text-gray-200 overflow-x-auto">
+  //                         <code>{suggestion.code}</code>
+  //                       </pre>
+  //                     </div>
+  //                   ))}
+  //                 </div>
+  //               </div>
+  //             )}
+
+  //             <div className="flex-1 min-h-[400px] rounded-xl overflow-hidden border border-gray-700">
+  //               <div ref={editorRef} className="w-full h-full" />
+  //             </div>
+
+  //             {/* Quick AI Actions Bar */}
+  //             <div className="mt-2 flex justify-between items-center text-xs text-gray-500">
+  //               <div className="flex space-x-4">
+
+  //                 {selectedText && <span>Selection: {selectedText.length} chars</span>}
+  //               </div>
+  //               <div className="flex items-center space-x-2">
+  //                 {isLoadingAi && <span>AI processing...</span>}
+  //                 <span>Lines: {activeFile?.content.split('\n').length || 0}</span>
+  //               </div>
+  //             </div>
+  //           </div>
+
+
+  //         </div>
+
+  //         {/* AI Chat Assistant */}
+  //         <ChatAssistant />
+  //       </div>
+  //     </div>
+
+  //     {/* Sidebar Chat */}
+  //     {isChatOpen && (
+  //       <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-lg border-l z-50 flex flex-col">
+  //         {/* Header */}
+  //         <div className="flex justify-between items-center p-3 border-b bg-purple-600 text-white">
+  //           <h2 className="font-semibold">Project Chat</h2>
+  //           <button onClick={() => setIsChatOpen(false)}>
+  //             <X size={20} />
+  //           </button>
+  //         </div>
+  //         {/* Chat Component */}
+  //         <Chat user={authUser} projectId={projectId} />
+  //       </div>
+  //     )}
+  //   </div>
+  // );
+
+
+
+
+
+
 // import React, { useState, useEffect, useRef } from 'react';
 
 // const FileTextIcon = () => (
