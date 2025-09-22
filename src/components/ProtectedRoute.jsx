@@ -35,7 +35,7 @@ export const ProtectedRoute = ({ children, role }) => {
   if (loadingAuth) return <div>Loading...</div>;
 
   if (!authUser) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
 
   if (role && authUser.role !== role) {
@@ -50,6 +50,6 @@ export const GuestRoute = ({ children }) => {
 
   if (loadingAuth) return <div>Loading...</div>;
 
-  return !authUser ? children : <Navigate to="/profile" />;
+  return !authUser ? children : <Navigate to="/" />;
 };
 

@@ -1,44 +1,63 @@
-
-
-
-
-// import { useEffect, useRef } from "react";
-// import * as monaco from "monaco-editor";
-
-// const CodeEditor = ({ code, onCodeChange }) => {
+// import React, { useRef, useState } from "react";
+// import Editor from "@monaco-editor/react";
+// export default function CodeEditor() {
 //   const editorRef = useRef(null);
-//   const containerRef = useRef(null);
+//   const [aiSuggestion, setAiSuggestion] = useState("");
 
-//   useEffect(() => {
-//     if (containerRef.current) {
-//       editorRef.current = monaco.editor.create(containerRef.current, {
-//         value: code,
-//         language: "javascript",
-//         automaticLayout: true,
+//   const handleEditorDidMount = (editor) => {
+//     editorRef.current = editor;
+//   };
+
+//   const getAISuggestion = async () => {
+//     const code = editorRef.current.getValue();
+
+//     try {
+//       const token = localStorage.getItem("token"); 
+//       const res = await fetch("http://localhost:8000/api/ai-autocomplete", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`,
+//         },
+//         body: JSON.stringify({ code }),
 //       });
 
-//       editorRef.current.onDidChangeModelContent(() => {
-//         const newCode = editorRef.current.getValue();
-//         onCodeChange(newCode);
-//       });
+//       if (!res.ok) throw new Error("Request failed");
+
+//       const data = await res.json();
+//       setAiSuggestion(data.suggestion);
+//     } catch (error) {
+//       console.error("AI Suggestion Error:", error.message);
 //     }
+//   };
 
-//     return () => {
-//       editorRef.current?.dispose();
-//     };
-//   }, [containerRef]);
+//   return (
+//     <div>
+//       <Editor
+//         height="400px"
+//         theme="vs-dark"
+//         defaultLanguage="javascript"
+//         defaultValue="// Start coding..."
+//         onMount={handleEditorDidMount}
+//       />
 
-//   // update editor if code prop changes from parent
-//   useEffect(() => {
-//     if (editorRef.current && editorRef.current.getValue() !== code) {
-//       editorRef.current.setValue(code);
-//     }
-//   }, [code]);
+//       <button
+//         onClick={getAISuggestion}
+//         className="bg-blue-500 text-white px-4 py-2 mt-2 rounded"
+//       >
+//         Get AI Suggestion
+//       </button>
 
-//   return <div ref={containerRef} style={{ height: "70vh", width: "100%" }} />;
-// };
+//       {aiSuggestion && (
+//         <div className="mt-4 p-2 bg-gray-100 border rounded">
+//           <h3 className="font-bold">AI Suggestion:</h3>
+//           <pre>{aiSuggestion}</pre>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
 
-// export default CodeEditor;
 
 
 

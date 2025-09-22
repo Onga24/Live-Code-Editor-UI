@@ -77,7 +77,7 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, User, Settings, FolderKanban, LayoutDashboard } from "lucide-react";
+import { LogOut, User, Settings, FolderKanban, LayoutDashboard, Users } from "lucide-react";
 import toast from "react-hot-toast";
 
 const Navbar = () => {
@@ -130,10 +130,10 @@ const Navbar = () => {
             </Link>
 
             <Link
-              to="/settings"
+              to="/friends"
               className="flex items-center gap-1 text-gray-700 hover:text-primary transition"
             >
-              <Settings className="w-4 h-4" /> Settings
+              <Users className="w-4 h-4" /> Friends
             </Link>
 
             <button

@@ -20,7 +20,9 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminUsersPage from './pages/Admin/AdminUsersPage'
 import AdminProjectsPage from './pages/Admin/AdminProjectsPage'
 import AdminLayout from './pages/Admin/AdminLayout';
-import ProjectEditorPage from './pages/ProjectEditorPage'
+import ProjectEditorPage from './pages/ProjectEditorPage';
+// import ChatPage from './pages/ChatPage';
+// import FriendsPage from './pages/FriendsPage';
 
 
 
@@ -34,10 +36,13 @@ function App() {
       <main className="pt-15">
 
         <Routes>
-          <Route path="/" element={<GuestRoute><HomePage /></GuestRoute>} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+
+          {/* <Route path="/friends" element={<ProtectedRoute><FriendsPage /></ProtectedRoute>} />
+<Route path="/chat/:id" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} /> */}
+
 
           
           <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
