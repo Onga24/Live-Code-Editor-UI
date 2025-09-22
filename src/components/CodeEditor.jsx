@@ -1,147 +1,108 @@
-// import React, { useRef, useState } from "react";
-// import Editor from "@monaco-editor/react";
-// export default function CodeEditor() {
-//   const editorRef = useRef(null);
-//   const [aiSuggestion, setAiSuggestion] = useState("");
+import React, { useRef } from "react";
+import Editor from "@monaco-editor/react";
 
-//   const handleEditorDidMount = (editor) => {
-//     editorRef.current = editor;
-//   };
-
-//   const getAISuggestion = async () => {
-//     const code = editorRef.current.getValue();
-
-//     try {
-//       const token = localStorage.getItem("token"); 
-//       const res = await fetch("http://localhost:8000/api/ai-autocomplete", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${token}`,
-//         },
-//         body: JSON.stringify({ code }),
-//       });
-
-//       if (!res.ok) throw new Error("Request failed");
-
-//       const data = await res.json();
-//       setAiSuggestion(data.suggestion);
-//     } catch (error) {
-//       console.error("AI Suggestion Error:", error.message);
-//     }
-//   };
-
-//   return (
-//     <div>
-//       <Editor
-//         height="400px"
-//         theme="vs-dark"
-//         defaultLanguage="javascript"
-//         defaultValue="// Start coding..."
-//         onMount={handleEditorDidMount}
-//       />
-
-//       <button
-//         onClick={getAISuggestion}
-//         className="bg-blue-500 text-white px-4 py-2 mt-2 rounded"
-//       >
-//         Get AI Suggestion
-//       </button>
-
-//       {aiSuggestion && (
-//         <div className="mt-4 p-2 bg-gray-100 border rounded">
-//           <h3 className="font-bold">AI Suggestion:</h3>
-//           <pre>{aiSuggestion}</pre>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-import { useEffect, useRef } from "react";
-import * as monaco from "monaco-editor";
-
-const langMap = {
-  javascript: "javascript",
-  python: "python",
-  php: "php",
-  java: "java",
-  cpp: "cpp",
-  c: "cpp",
-  html: "html",
-};
-
-export default function CodeEditor({ code, onCodeChange, language = "javascript" }) {
-  const containerRef = useRef(null);
+export default function CodeEditor({ code, onCodeChange, language }) {
   const editorRef = useRef(null);
-  const modelRef = useRef(null);
-  const updatingFromProp = useRef(false);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
+  const handleEditorDidMount = (editor) => {
+    editorRef.current = editor;
 
-    // create model once
-    const monacoLang = langMap[language] || "plaintext";
-    modelRef.current = monaco.editor.createModel(code || "", monacoLang);
-
-    editorRef.current = monaco.editor.create(containerRef.current, {
-      model: modelRef.current,
-      automaticLayout: true,
-      theme: "vs-dark",
-      minimap: { enabled: false },
-      fontSize: 14,
+    editor.onDidChangeModelContent(() => {
+      const value = editor.getValue();
+      onCodeChange(value);
     });
+  };
 
-    const disposable = editorRef.current.onDidChangeModelContent(() => {
-      if (updatingFromProp.current) return;
-      const val = editorRef.current.getValue();
-      onCodeChange && onCodeChange(val);
-    });
-
-    return () => {
-      disposable.dispose();
-      editorRef.current.dispose();
-      modelRef.current.dispose();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // create only once
-
-  // update editor value when parent prop changes (but avoid clobbering while typing)
-  useEffect(() => {
-    if (!editorRef.current || !modelRef.current) return;
-    const current = editorRef.current.getValue();
-    if (current !== code) {
-      updatingFromProp.current = true;
-      // keep cursor position - setValue resets cursor, so use applyEdits for smoother behaviour could be added.
-      modelRef.current.setValue(code || "");
-      // small timeout to allow onDidChangeModelContent to ignore this programmatic change
-      setTimeout(() => {
-        updatingFromProp.current = false;
-      }, 0);
-    }
-  }, [code]);
-
-  // change language dynamically
-  useEffect(() => {
-    if (!modelRef.current) return;
-    const monacoLang = langMap[language] || "plaintext";
-    try {
-      monaco.editor.setModelLanguage(modelRef.current, monacoLang);
-    } catch (e) {
-      // ignore if language not supported
-      console.warn("setModelLanguage failed", e);
-    }
-  }, [language]);
-
-  return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
+  return (
+    <Editor
+      height="400px"
+      theme="vs-dark"
+      defaultLanguage={language}
+      value={code}
+      onMount={handleEditorDidMount}
+    />
+  );
 }
+
+
+
+
+
+// import { useEffect, useRef } from "react";
+// import * as monaco from "monaco-editor";
+
+// const langMap = {
+//   javascript: "javascript",
+//   python: "python",
+//   php: "php",
+//   java: "java",
+//   cpp: "cpp",
+//   c: "cpp",
+//   html: "html",
+// };
+
+// export default function CodeEditor({ code, onCodeChange, language = "javascript" }) {
+//   const containerRef = useRef(null);
+//   const editorRef = useRef(null);
+//   const modelRef = useRef(null);
+//   const updatingFromProp = useRef(false);
+
+//   useEffect(() => {
+//     if (!containerRef.current) return;
+
+//     // create model once
+//     const monacoLang = langMap[language] || "plaintext";
+//     modelRef.current = monaco.editor.createModel(code || "", monacoLang);
+
+//     editorRef.current = monaco.editor.create(containerRef.current, {
+//       model: modelRef.current,
+//       automaticLayout: true,
+//       theme: "vs-dark",
+//       minimap: { enabled: false },
+//       fontSize: 14,
+//     });
+
+//     const disposable = editorRef.current.onDidChangeModelContent(() => {
+//       if (updatingFromProp.current) return;
+//       const val = editorRef.current.getValue();
+//       onCodeChange && onCodeChange(val);
+//     });
+
+//     return () => {
+//       disposable.dispose();
+//       editorRef.current.dispose();
+//       modelRef.current.dispose();
+//     };
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, []); // create only once
+
+//   // update editor value when parent prop changes (but avoid clobbering while typing)
+//   useEffect(() => {
+//     if (!editorRef.current || !modelRef.current) return;
+//     const current = editorRef.current.getValue();
+//     if (current !== code) {
+//       updatingFromProp.current = true;
+//       // keep cursor position - setValue resets cursor, so use applyEdits for smoother behaviour could be added.
+//       modelRef.current.setValue(code || "");
+//       // small timeout to allow onDidChangeModelContent to ignore this programmatic change
+//       setTimeout(() => {
+//         updatingFromProp.current = false;
+//       }, 0);
+//     }
+//   }, [code]);
+
+//   // change language dynamically
+//   useEffect(() => {
+//     if (!modelRef.current) return;
+//     const monacoLang = langMap[language] || "plaintext";
+//     try {
+//       monaco.editor.setModelLanguage(modelRef.current, monacoLang);
+//     } catch (e) {
+//       // ignore if language not supported
+//       console.warn("setModelLanguage failed", e);
+//     }
+//   }, [language]);
+
+//   return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
+// }
 
